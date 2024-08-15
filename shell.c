@@ -16,6 +16,8 @@
 #define BLANCO      "\033[1;37m"
 #define RESET_COLOR "\033[0m"
 
+char ***comandos = NULL;
+
 char *Directorio_actual(){
     FILE *fp = popen("pwd","r");
 
@@ -23,33 +25,31 @@ char *Directorio_actual(){
 
     // Leer la salida del comando
     char buffer[BUFFER_SIZE];
+    char *ruta_actual = NULL;
     if (fgets(buffer, sizeof(buffer), fp) != NULL) {
         buffer[strcspn(buffer, "\n")] = '\0';   //Busca el salto de linea y lo reemplazo por fin de linea
-        
-        char *ruta_actual = strdup(buffer);
-        if (ruta_actual == NULL) return NULL;
-
-        return ruta_actual;
+        ruta_actual = strdup(buffer);
     }
-    else return NULL;
+    
+    pclose(fp);
+    return ruta_actual;
 }
 
 char *Usuario_actual(){
     FILE *fp = popen("whoami","r");
-
+    
     if (fp == NULL) return NULL;
 
     // Leer la salida del comando
     char buffer[BUFFER_SIZE];
+    char *usuario_actual = NULL;
     if (fgets(buffer, sizeof(buffer), fp) != NULL) {
         buffer[strcspn(buffer, "\n")] = '\0';   //Busca el salto de linea y lo reemplazo por fin de linea
-        
-        char *usuario_actual = strdup(buffer);
-        if (usuario_actual == NULL) return NULL;
-
-        return usuario_actual;
+        usuario_actual = strdup(buffer);
     }
-    else return NULL;
+
+    pclose(fp);
+    return usuario_actual;
 }
 
 char ***entrada_comandos(){
@@ -124,10 +124,19 @@ char ***entrada_comandos(){
     return comandos;
 }
 
+void liberar_comandos(char ***comandos){
+    for (int i = 0; comandos[i] != NULL; i++) {
+        for (int j = 0; comandos[i][j] != NULL; j++) free(comandos[i][j]);
+        free(comandos[i]);
+    }
+    free(comandos);
+}
+
 // Manejador de signals
 void sig_handler(int sig) {
     if(sig == SIGTERM){
         printf(BLANCO "\nSaliendo de la SHELL\n" RESET_COLOR);
+        liberar_comandos(comandos);
         exit(0);
     }
     else if(sig == SIGINT){}
@@ -138,48 +147,41 @@ void sig_handler(int sig) {
 
 }
 
-void liberar_comandos(char ***comandos){
-    for (int i = 0; comandos[i] != NULL; i++) {
-        for (int j = 0; comandos[i][j] != NULL; j++) free(comandos[i][j]);
-        free(comandos[i]);
-    }
-    free(comandos);
-}
-
 // Manejar comandos internos propios de esta SHELL
-int Manejar_comandos_internos(char **comandos){
-    if(comandos[1] == NULL && strcmp(comandos[0], "exit") == 0){     //Si se escribe "exit" se termina ded ejecutar el programa
+int Manejar_comandos_internos(char **comando){
+    if(comando[1] == NULL && strcmp(comando[0], "exit") == 0){     //Si se escribe "exit" se termina ded ejecutar el programa
         raise(SIGTERM);
     }
 
-    if(strcmp(comandos[0], "cd") == 0){
-        if(comandos[1] == NULL) printf(ROJO "FALTA UN ARGUMENTO" RESET_COLOR "\n");
-        else if (strcmp(comandos[1], "~") == 0) {   //Implementacion del comando para dirigirse al Directorio Raiz
+    if(strcmp(comando[0], "cd") == 0){
+        if(comando[1] == NULL) printf(ROJO "FALTA UN ARGUMENTO" RESET_COLOR "\n");
+        else if (strcmp(comando[1], "~") == 0) {   //Implementacion del comando para dirigirse al Directorio Raiz
             char *home_dir = getenv("HOME");
             if (home_dir != NULL) {
                 if (chdir(home_dir) != 0) printf(ROJO "Error al ingresar al Directorio HOME" RESET_COLOR "\n");
             }
             else printf(ROJO "Variable de entorno HOME no está definida" RESET_COLOR "\n");
         }
-        else if (chdir(comandos[1]) != 0) perror(ROJO "Error al ingresar al Directorio" RESET_COLOR);
+        else if (chdir(comando[1]) != 0) perror(ROJO "Error al ingresar al Directorio" RESET_COLOR);
         
         return 1;
     }
-    return 0;
+    return 0;   //No encontro ningun Comando Interno
 }
 
-void Manejar_comandos_externos(char **comandos){
+void Manejar_comandos_externos(char **comando){
     pid_t child_pid = fork();
 
     // Proceso hijo
     if(child_pid == 0){
-        if (execvp(comandos[0], comandos) == -1) perror(ROJO "Error en execvp");
+        if (execvp(comando[0], comando) == -1) perror(ROJO "Error en execvp");
         exit(EXIT_FAILURE);
     }
     // Proceso padre
     else if (child_pid > 0) waitpid(child_pid, NULL, 0);
     else {
         perror(ROJO "Error al crear proceso hijo" RESET_COLOR);
+        liberar_comandos(comandos);
         exit(EXIT_FAILURE);
     }
 }
@@ -190,7 +192,7 @@ int main(){
     signal(SIGTERM, sig_handler);
 
     while(1){
-        char*** comandos = entrada_comandos();
+        comandos = entrada_comandos();
         if(comandos == NULL) continue;
 
         for(int i=0;comandos[i] != NULL;i++){
