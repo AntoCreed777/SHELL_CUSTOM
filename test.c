@@ -100,6 +100,24 @@ char **entrada_comandos(){
     return comandos;
 }
 
+// Manejador de signals
+void sig_handler(int sig) {
+    if(sig == SIGINT || sig == SIGTERM){
+        printf(BLANCO "\nSaliendo de la SHELL\n" RESET_COLOR);
+        exit(0);
+    }
+    else if(sig == SIGCHLD){
+        wait(NULL); // Espera al proceso hijo que ha terminado
+        //printf(BLANCO "\nProceso hijo terminado\n" RESET_COLOR);
+    }
+
+}
+
+void liberar_comandos(char **comandos){
+    for (int i = 0; comandos[i] != NULL; i++) free(comandos[i]);
+    free(comandos);
+}
+
 char ***Identificador_de_comandos(char **comandos){
     char ***identificados = NULL;
     int contador_comandos=0;
@@ -136,68 +154,11 @@ char ***Identificador_de_comandos(char **comandos){
     return identificados;
 }
 
-// Manejador de signals
-void sig_handler(int sig) {
-    if(sig == SIGINT || sig == SIGTERM){
-        printf(BLANCO "\nSaliendo de la SHELL\n" RESET_COLOR);
-        exit(0);
-    }
-    else if(sig == SIGCHLD){
-        wait(NULL); // Espera al proceso hijo que ha terminado
-        //printf(BLANCO "\nProceso hijo terminado\n" RESET_COLOR);
-    }
-
-}
-
-void liberar_comandos(char **comandos){
-    for (int i = 0; comandos[i] != NULL; i++) free(comandos[i]);
-    free(comandos);
-}
-
-// Manejar comandos internos propios de esta SHELL
-int Manejar_comandos_internos(char **comandos){
-    if(comandos[1] == NULL && strcmp(comandos[0], "exit") == 0){     //Si se escribe "exit" se termina ded ejecutar el programa
-        liberar_comandos(comandos);
-        raise(SIGTERM);
-    }
-
-    if(strcmp(comandos[0], "cd") == 0){
-        if(comandos[1] == NULL) printf(ROJO "FALTA UN ARGUMENTO" RESET_COLOR "\n");
-        else if (strcmp(comandos[1], "~") == 0) {   //Implementacion del comando para dirigirse al Directorio Raiz
-            char *home_dir = getenv("HOME");
-            if (home_dir != NULL) {
-                if (chdir(home_dir) != 0) printf(ROJO "Error al ingresar al Directorio HOME" RESET_COLOR "\n");
-            }
-            else printf(ROJO "Variable de entorno HOME no está definida" RESET_COLOR "\n");
-        }
-        else if (chdir(comandos[1]) != 0) perror(ROJO "Error al ingresar al Directorio" RESET_COLOR);
-        
-        liberar_comandos(comandos);
-        return 1;
-    }
-    return 0;
-}
-
-void Manejar_comandos_externos(char **comandos){
-    pid_t child_pid = fork();
-
-    // Proceso hijo
-    if(child_pid == 0){
-        if (execvp(comandos[0], comandos) == -1) perror(ROJO "Error en execvp");
-        exit(EXIT_FAILURE);
-    }
-    // Proceso padre
-    else if (child_pid > 0) waitpid(child_pid, NULL, 0);
-    else {
-        perror(ROJO "Error al crear proceso hijo" RESET_COLOR);
-        exit(EXIT_FAILURE);
-    }
-}
-
 int main(){
     signal(SIGINT, sig_handler);
     signal(SIGCHLD, sig_handler);
     signal(SIGTERM, sig_handler);
+
 
     while(1){
         char** comandos = entrada_comandos();
@@ -206,12 +167,12 @@ int main(){
             continue;
         }
 
-        char ***comandos_separados = Identificador_de_comandos(comandos);
+        char ***conjunto_comandos = Identificador_de_comandos(comandos);
 
-        for(int i=0;comandos_separados[i] != NULL;i++){
-            if(Manejar_comandos_internos(comandos_separados[i])) continue;   // Si se ejecuto un comando interno que no trate de ejecutar uno externo 
-
-            Manejar_comandos_externos(comandos_separados[i]);
+        for(int i=0;conjunto_comandos[i] != NULL;i++){
+            for(int j=0;conjunto_comandos[i][j] != NULL;j++) printf("%s\t",conjunto_comandos[i][j]);
+            // printf("%s",conjunto_comandos[i][0]);
+            printf("\n");
         }
 
         liberar_comandos(comandos);
