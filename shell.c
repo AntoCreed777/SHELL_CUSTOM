@@ -55,7 +55,7 @@ char *Usuario_actual(){
 char **entrada_comandos(){
     char *ruta_actual = Directorio_actual();
     char *usuario_actual = Usuario_actual();
-    printf("%s%s@SHELL_CUSTOM:%s%s$ %s",VERDE,usuario_actual,AZUL,ruta_actual, RESET_COLOR);   // Prompt que se muestra al esperar un comando
+    printf("%s%s@SHELL_CUSTOM%s:%s%s%s$ %s",VERDE,usuario_actual,BLANCO,AZUL,ruta_actual,BLANCO,RESET_COLOR);   // Prompt que se muestra al esperar un comando
     free(ruta_actual);
     free(usuario_actual);
 
