@@ -52,7 +52,7 @@ char *Usuario_actual(){
     else return NULL;
 }
 
-char **entrada_comandos(){
+char ***entrada_comandos(){
     char *ruta_actual = Directorio_actual();
     char *usuario_actual = Usuario_actual();
     printf("%s%s@SHELL_CUSTOM%s:%s%s%s$ %s",VERDE,usuario_actual,BLANCO,AZUL,ruta_actual,BLANCO,RESET_COLOR);   // Prompt que se muestra al esperar un comando
@@ -65,75 +65,63 @@ char **entrada_comandos(){
     int buffer_leido = getline(&cadena, &numero_bytes, stdin);
 
     if (buffer_leido == -1){
-        printf(ROJO "ERROR" RESET_COLOR);
+        printf(ROJO "ERROR AL LEER INPUT" RESET_COLOR);
         return NULL;
     }
     else if(buffer_leido == 1) return NULL; //Si no se ingresa ningun comando, (solamente ingresa '\n')
 
     //Extraccion de las distintas partes del comando
-    char **comandos = NULL;
+    char ***comandos = NULL;
     int comando = 0;
+    char *contexto_comando;
 
-    char *token = strtok(cadena," \n"); // Separo por ' ' (espacio) eliminando el '\n'
+    char *token_comando = strtok_r(cadena,";\n",&contexto_comando); // Separo por ';' eliminando el '\n'
 
-    while(token != NULL){
-        comandos = (char**)realloc(comandos,sizeof(char*) * (comando+1));
+    while(token_comando != NULL){
+
+        comandos = (char***)realloc(comandos,sizeof(char**) * (comando+1));
 
         if(comandos == NULL){
             perror(ROJO "Error en la reasignación de memoria");
             exit(EXIT_FAILURE);
         }
+        comandos[comando] = NULL;
 
-        comandos[comando] = (char*)malloc(sizeof(char) * (strlen(token) + 1));
-        strcpy(comandos[comando],token);
+        int elemento = 0;
+        char *contexto_elemento;
+        char *token_elementos = strtok_r(token_comando," ",&contexto_elemento); // Separo por ' ' (espacio)
+
+        while(token_elementos != NULL){
+
+            comandos[comando] = (char**)realloc(comandos[comando],sizeof(char*) * (elemento+1));
+
+            if(comandos == NULL){
+                perror(ROJO "Error en la reasignación de memoria");
+                exit(EXIT_FAILURE);
+            }
+
+            comandos[comando][elemento] = (char*)malloc(sizeof(char) * (strlen(token_elementos) + 1));
+
+            strcpy(comandos[comando][elemento],token_elementos);
+            elemento++;
+            token_elementos = strtok_r(NULL," ",&contexto_elemento);
+        }
+
+        // Añadimos un NULL al final del array para marcar el fin del comando
+        comandos[comando] = (char **)realloc(comandos[comando], sizeof(char*) * (elemento+1));
+        comandos[comando][elemento] = NULL;
 
         comando++;
-        token = strtok(NULL, " \n");
+        token_comando = strtok_r(NULL,";\n",&contexto_comando);
     }
-    
+
     // Añadimos un NULL al final del array para marcar el fin de los comandos
-    comandos = (char **)realloc(comandos, sizeof(char*) * (comando + 1));
+    comandos = (char ***)realloc(comandos, sizeof(char**) * (comando + 1));
     comandos[comando] = NULL;
 
     free(cadena); // Liberar la cadena original
 
     return comandos;
-}
-
-char ***Identificador_de_comandos(char **comandos){
-    char ***identificados = NULL;
-    int contador_comandos=0;
-    int contador_elementos=1;
-
-    for(int i=0;comandos[i] != NULL;i++){
-        if(comandos[i][0] != '-'){
-            // Nuevo Comando
-            contador_comandos++;
-            contador_elementos = 1;
-            
-            // Espacio para nuevo comando
-            identificados = (char***)realloc(identificados,sizeof(char**) * contador_comandos);
-
-            // Asignar memoria para el primer elemento del comando
-            identificados[contador_comandos-1] = (char**)malloc(sizeof(char*) * contador_elementos);
-            identificados[contador_comandos-1][contador_elementos-1] = comandos[i];
-        }
-        else{
-            // Nuevo elemento del comando
-            contador_elementos++;
-
-            // Asignar memoria para el nuevo elemento del comando
-            identificados[contador_comandos-1] = (char**)realloc(identificados[contador_comandos-1],sizeof(char*) * contador_elementos);
-            identificados[contador_comandos-1][contador_elementos-1] = comandos[i];
-        }
-        //printf("%s\n",identificados[contador_comandos-1][contador_elementos-1]);
-    }
-
-    // Añadir un NULL para indicar el final de la lista de comandos
-    identificados = (char***)realloc(identificados, sizeof(char**) * (contador_comandos + 1));
-    identificados[contador_comandos] = NULL;
-
-    return identificados;
 }
 
 // Manejador de signals
@@ -150,15 +138,17 @@ void sig_handler(int sig) {
 
 }
 
-void liberar_comandos(char **comandos){
-    for (int i = 0; comandos[i] != NULL; i++) free(comandos[i]);
+void liberar_comandos(char ***comandos){
+    for (int i = 0; comandos[i] != NULL; i++) {
+        for (int j = 0; comandos[i][j] != NULL; j++) free(comandos[i][j]);
+        free(comandos[i]);
+    }
     free(comandos);
 }
 
 // Manejar comandos internos propios de esta SHELL
 int Manejar_comandos_internos(char **comandos){
     if(comandos[1] == NULL && strcmp(comandos[0], "exit") == 0){     //Si se escribe "exit" se termina ded ejecutar el programa
-        liberar_comandos(comandos);
         raise(SIGTERM);
     }
 
@@ -173,7 +163,6 @@ int Manejar_comandos_internos(char **comandos){
         }
         else if (chdir(comandos[1]) != 0) perror(ROJO "Error al ingresar al Directorio" RESET_COLOR);
         
-        liberar_comandos(comandos);
         return 1;
     }
     return 0;
@@ -201,15 +190,13 @@ int main(){
     signal(SIGTERM, sig_handler);
 
     while(1){
-        char** comandos = entrada_comandos();
+        char*** comandos = entrada_comandos();
         if(comandos == NULL) continue;
 
-        char ***comandos_separados = Identificador_de_comandos(comandos);
+        for(int i=0;comandos[i] != NULL;i++){
+            if(Manejar_comandos_internos(comandos[i])) continue;   // Si se ejecuto un comando interno que no trate de ejecutar uno externo 
 
-        for(int i=0;comandos_separados[i] != NULL;i++){
-            if(Manejar_comandos_internos(comandos_separados[i])) continue;   // Si se ejecuto un comando interno que no trate de ejecutar uno externo 
-
-            Manejar_comandos_externos(comandos_separados[i]);
+            Manejar_comandos_externos(comandos[i]);
         }
 
         liberar_comandos(comandos);
