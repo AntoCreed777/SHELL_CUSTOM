@@ -21,7 +21,7 @@ char **entrada_comandos(){
     size_t numero_bytes = 0;    //Tamano del buffer
     char *cadena = NULL;
 
-    printf(VERDE "antocreed777@ARCHLINUX: " RESET_COLOR);
+    printf(VERDE "antocreed777@ARCHLINUX$ " RESET_COLOR);
 
     int buffer_leido = getline(&cadena, &numero_bytes, stdin);
 
@@ -61,7 +61,7 @@ char **entrada_comandos(){
     return comandos;
 }
 
-// manejador de signals
+// Manejador de signals
 void sig_handler(int sig) {
     if(sig == SIGINT || sig == SIGTERM){
         printf(BLANCO "\nSaliendo de la SHELL\n" RESET_COLOR);
@@ -92,9 +92,19 @@ int main(){
             continue;
         }
 
+        // Manejar comandos internos propios de esta SHELL
         if(comandos[1] == NULL && strcmp(comandos[0], "exit") == 0){     //Si se escribe "exit" se termina ded ejecutar el programa
             liberar_comandos(comandos);
             raise(SIGTERM);
+        }
+
+        if(strcmp(comandos[0], "cd") == 0){
+            if(comandos[1] != NULL){
+                if (chdir(comandos[1]) != 0) perror(ROJO "Error al ingresar al Directorio" RESET_COLOR);
+            }
+            else printf(ROJO "FALTA UN ARGUMENTO" RESET_COLOR);
+            liberar_comandos(comandos);
+            continue;
         }
 
         pid_t child_pid = fork();
