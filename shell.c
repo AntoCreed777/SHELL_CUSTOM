@@ -5,6 +5,8 @@
 #include <signal.h>
 #include <sys/wait.h>
 
+#define BUFFER_SIZE 1024
+
 #define ROJO        "\033[0;31m"
 #define VERDE       "\033[0;32m"
 #define AMARILLO    "\033[0;33m"
@@ -14,15 +16,33 @@
 #define BLANCO      "\033[1;37m"
 #define RESET_COLOR "\033[0m"
 
+char *directorio_actual(){
+    FILE *fp = popen("pwd","r");
+
+    if (fp == NULL) return NULL;
+
+    // Leer la salida del comando
+    char buffer[BUFFER_SIZE];
+    if (fgets(buffer, sizeof(buffer), fp) != NULL) {
+        buffer[strcspn(buffer, "\n")] = '\0';   //Busca el salto de linea y lo reemplazo por fin de linea
+        
+        char *ruta_actual = strdup(buffer);
+        if (ruta_actual == NULL) return NULL;
+
+        return ruta_actual;
+    }
+    else return NULL;
+}
+
 
 char **entrada_comandos(){
+    char *ruta_actual = directorio_actual();
+    printf("%santocreed777@ARCHLINUX:%s%s$ %s",VERDE,AZUL,ruta_actual, RESET_COLOR);
+    free(ruta_actual);
 
     //Entrada de linea de comando
     size_t numero_bytes = 0;    //Tamano del buffer
     char *cadena = NULL;
-
-    printf(VERDE "antocreed777@ARCHLINUX$ " RESET_COLOR);
-
     int buffer_leido = getline(&cadena, &numero_bytes, stdin);
 
     if (buffer_leido == -1){
@@ -69,7 +89,7 @@ void sig_handler(int sig) {
     }
     else if(sig == SIGCHLD){
         wait(NULL); // Espera al proceso hijo que ha terminado
-        printf(BLANCO "\nProceso hijo terminado\n" RESET_COLOR);
+        //printf(BLANCO "\nProceso hijo terminado\n" RESET_COLOR);
     }
 
 }
@@ -99,10 +119,14 @@ int main(){
         }
 
         if(strcmp(comandos[0], "cd") == 0){
-            if(comandos[1] != NULL){
-                if (chdir(comandos[1]) != 0) perror(ROJO "Error al ingresar al Directorio" RESET_COLOR);
+            if (strcmp(comandos[1], "~") == 0) {
+                char *home_dir = getenv("HOME");
+                if (home_dir != NULL) {
+                    if (chdir(home_dir) != 0) printf(ROJO "Error al ingresar al Directorio HOME" RESET_COLOR "\n");
+                }
+                else printf(ROJO "Variable de entorno HOME no está definida" RESET_COLOR "\n");
             }
-            else printf(ROJO "FALTA UN ARGUMENTO" RESET_COLOR);
+            else printf(ROJO "FALTA UN ARGUMENTO" RESET_COLOR "\n");
             liberar_comandos(comandos);
             continue;
         }
