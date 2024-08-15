@@ -138,10 +138,11 @@ char ***Identificador_de_comandos(char **comandos){
 
 // Manejador de signals
 void sig_handler(int sig) {
-    if(sig == SIGINT || sig == SIGTERM){
+    if(sig == SIGTERM){
         printf(BLANCO "\nSaliendo de la SHELL\n" RESET_COLOR);
         exit(0);
     }
+    else if(sig == SIGINT){}
     else if(sig == SIGCHLD){
         wait(NULL); // Espera al proceso hijo que ha terminado
         //printf(BLANCO "\nProceso hijo terminado\n" RESET_COLOR);
@@ -201,10 +202,7 @@ int main(){
 
     while(1){
         char** comandos = entrada_comandos();
-        if(comandos == NULL){
-            printf(ROJO "NO SE INGRESO NADA\n");
-            continue;
-        }
+        if(comandos == NULL) continue;
 
         char ***comandos_separados = Identificador_de_comandos(comandos);
 
