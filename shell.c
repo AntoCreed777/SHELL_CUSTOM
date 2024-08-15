@@ -26,9 +26,10 @@ char **entrada_comandos(){
     int buffer_leido = getline(&cadena, &numero_bytes, stdin);
 
     if (buffer_leido == -1){
-        printf("ERROR");
+        printf(ROJO "ERROR" RESET_COLOR);
         return NULL;
     }
+    else if(buffer_leido == 1) return NULL; //Si no se ingresa ningun comando, (solamente ingresa '\n')
 
     //Extraccion de las distintas partes del comando
     char **comandos = NULL;
@@ -87,7 +88,7 @@ int main(){
     while(1){
         char** comandos = entrada_comandos();
         if(comandos == NULL){
-            printf(ROJO "NO SE INGRESO NADA");
+            printf(ROJO "NO SE INGRESO NADA\n");
             continue;
         }
 
