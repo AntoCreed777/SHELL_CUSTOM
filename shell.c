@@ -16,7 +16,7 @@
 #define BLANCO      "\033[1;37m"
 #define RESET_COLOR "\033[0m"
 
-char *directorio_actual(){
+char *Directorio_actual(){
     FILE *fp = popen("pwd","r");
 
     if (fp == NULL) return NULL;
@@ -34,11 +34,30 @@ char *directorio_actual(){
     else return NULL;
 }
 
+char *Usuario_actual(){
+    FILE *fp = popen("whoami","r");
+
+    if (fp == NULL) return NULL;
+
+    // Leer la salida del comando
+    char buffer[BUFFER_SIZE];
+    if (fgets(buffer, sizeof(buffer), fp) != NULL) {
+        buffer[strcspn(buffer, "\n")] = '\0';   //Busca el salto de linea y lo reemplazo por fin de linea
+        
+        char *usuario_actual = strdup(buffer);
+        if (usuario_actual == NULL) return NULL;
+
+        return usuario_actual;
+    }
+    else return NULL;
+}
 
 char **entrada_comandos(){
-    char *ruta_actual = directorio_actual();
-    printf("%santocreed777@ARCHLINUX:%s%s$ %s",VERDE,AZUL,ruta_actual, RESET_COLOR);
+    char *ruta_actual = Directorio_actual();
+    char *usuario_actual = Usuario_actual();
+    printf("%s%s@SHELL_CUSTOM:%s%s$ %s",VERDE,usuario_actual,AZUL,ruta_actual, RESET_COLOR);   // Prompt que se muestra al esperar un comando
     free(ruta_actual);
+    free(usuario_actual);
 
     //Entrada de linea de comando
     size_t numero_bytes = 0;    //Tamano del buffer
