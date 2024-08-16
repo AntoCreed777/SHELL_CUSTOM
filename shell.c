@@ -17,6 +17,7 @@
 #define RESET_COLOR "\033[0m"
 
 char ***comandos = NULL;
+char ***comandos_anteriores = NULL;
 
 char *Directorio_actual(){
     FILE *fp = popen("pwd","r");
@@ -95,7 +96,7 @@ char ***entrada_comandos(){
 
             comandos[comando] = (char**)realloc(comandos[comando],sizeof(char*) * (elemento+1));
 
-            if(comandos == NULL){
+            if(comandos[comando] == NULL){
                 perror(ROJO "Error en la reasignación de memoria");
                 exit(EXIT_FAILURE);
             }
@@ -124,7 +125,7 @@ char ***entrada_comandos(){
     return comandos;
 }
 
-void liberar_comandos(char ***comandos){
+void liberar_comandos(){
     for (int i = 0; comandos[i] != NULL; i++) {
         for (int j = 0; comandos[i][j] != NULL; j++) free(comandos[i][j]);
         free(comandos[i]);
@@ -132,11 +133,20 @@ void liberar_comandos(char ***comandos){
     free(comandos);
 }
 
+void liberar_comandos_anteriores(){
+    for(int i=0;comandos_anteriores[i] != NULL;i++) {
+        for(int j=0;comandos_anteriores[i][j] != NULL;j++) free(comandos_anteriores[i][j]);
+        free(comandos_anteriores[i]);
+    }
+    free(comandos_anteriores);
+}
+
 // Manejador de signals
 void sig_handler(int sig) {
     if(sig == SIGTERM){
         printf(BLANCO "\nSaliendo de la SHELL\n" RESET_COLOR);
-        liberar_comandos(comandos);
+        liberar_comandos();
+        liberar_comandos_anteriores();
         exit(0);
     }
     else if(sig == SIGINT){}
@@ -151,6 +161,15 @@ void sig_handler(int sig) {
 int Manejar_comandos_internos(char **comando){
     if(comando[1] == NULL && strcmp(comando[0], "exit") == 0){     //Si se escribe "exit" se termina ded ejecutar el programa
         raise(SIGTERM);
+    }
+
+    if(strcmp(comando[0], "!!") == 0){
+        if(comandos_anteriores == NULL) return 1;
+        for(int i=0;comandos_anteriores[i] != NULL;i++) {
+            for(int j=0;comandos_anteriores[i][j] != NULL;j++) printf("%s ",comandos_anteriores[i][j]);
+            printf("\n");
+        }
+        return 1;
     }
 
     if(strcmp(comando[0], "cd") == 0){
@@ -181,9 +200,48 @@ void Manejar_comandos_externos(char **comando){
     else if (child_pid > 0) waitpid(child_pid, NULL, 0);
     else {
         perror(ROJO "Error al crear proceso hijo" RESET_COLOR);
-        liberar_comandos(comandos);
+        liberar_comandos();
         exit(EXIT_FAILURE);
     }
+}
+
+void guardar_comandos(){
+    if(comandos_anteriores != NULL) liberar_comandos_anteriores();
+    comandos_anteriores = NULL;
+
+    int num_comandos = 0;
+
+    while(comandos[num_comandos] != NULL) {   // Comandos
+
+        comandos_anteriores = (char***)realloc(comandos_anteriores,sizeof(char**) * (num_comandos+1));
+        
+        if(comandos_anteriores == NULL){
+            perror(ROJO "Error en la reasignación de memoria");
+            liberar_comandos();
+            exit(EXIT_FAILURE);
+        }
+
+        comandos_anteriores[num_comandos]= NULL;
+
+        int num_elementos = 0;
+
+        while(comandos[num_comandos][num_elementos] != NULL){    // Elementos del Comando
+            comandos_anteriores[num_comandos] = (char**)realloc(comandos_anteriores[num_comandos],sizeof(char*) * (num_elementos+1));
+            
+            if(comandos_anteriores[num_comandos] == NULL){
+                perror(ROJO "Error en la reasignación de memoria");
+                exit(EXIT_FAILURE);
+            }
+
+            comandos_anteriores[num_comandos][num_elementos] = strdup(comandos[num_comandos][num_elementos]);
+            num_elementos++;
+        }
+        comandos_anteriores[num_comandos] = (char**)realloc(comandos_anteriores[num_comandos],sizeof(char*) * (num_elementos+1));
+        comandos_anteriores[num_comandos][num_elementos] = NULL;
+        num_comandos++;
+    }
+    comandos_anteriores = (char***)realloc(comandos_anteriores,sizeof(char**) * (num_comandos+1));
+    comandos_anteriores[num_comandos] = NULL;
 }
 
 int main(){
@@ -201,7 +259,8 @@ int main(){
             Manejar_comandos_externos(comandos[i]);
         }
 
-        liberar_comandos(comandos);
+        guardar_comandos();
+        liberar_comandos();
     }
 
     return 0;
