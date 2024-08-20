@@ -206,6 +206,8 @@ void Manejar_comandos_externos(char **comando){
 }
 
 void guardar_comandos(){
+    if(strcmp(comandos[0][0],"!!") == 0) return;
+    
     if(comandos_anteriores != NULL) liberar_comandos_anteriores();
     comandos_anteriores = NULL;
 
