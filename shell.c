@@ -157,6 +157,23 @@ void sig_handler(int sig) {
 
 }
 
+void Manejar_comandos_externos(char **comando){
+    pid_t child_pid = fork();
+
+    // Proceso hijo
+    if(child_pid == 0){
+        if (execvp(comando[0], comando) == -1) perror(ROJO "Error en execvp");
+        exit(EXIT_FAILURE);
+    }
+    // Proceso padre
+    else if (child_pid > 0) waitpid(child_pid, NULL, 0);
+    else {
+        perror(ROJO "Error al crear proceso hijo" RESET_COLOR);
+        liberar_comandos();
+        exit(EXIT_FAILURE);
+    }
+}
+
 // Manejar comandos internos propios de esta SHELL
 int Manejar_comandos_internos(char **comando){
     if(comando[1] == NULL && strcmp(comando[0], "exit") == 0){     //Si se escribe "exit" se termina ded ejecutar el programa
@@ -165,10 +182,18 @@ int Manejar_comandos_internos(char **comando){
 
     if(strcmp(comando[0], "!!") == 0){
         if(comandos_anteriores == NULL) return 1;
+
+        //Impresion de los comandos anteriores
         for(int i=0;comandos_anteriores[i] != NULL;i++) {
+            printf("Command %d: ",i+1);
             for(int j=0;comandos_anteriores[i][j] != NULL;j++) printf("%s ",comandos_anteriores[i][j]);
             printf("\n");
         }
+
+        //Ejecucion de los comandos anteriores
+
+        for(int i=0;comandos_anteriores[i] != NULL;i++) Manejar_comandos_externos(comandos_anteriores[i]);
+
         return 1;
     }
 
@@ -186,23 +211,6 @@ int Manejar_comandos_internos(char **comando){
         return 1;
     }
     return 0;   //No encontro ningun Comando Interno
-}
-
-void Manejar_comandos_externos(char **comando){
-    pid_t child_pid = fork();
-
-    // Proceso hijo
-    if(child_pid == 0){
-        if (execvp(comando[0], comando) == -1) perror(ROJO "Error en execvp");
-        exit(EXIT_FAILURE);
-    }
-    // Proceso padre
-    else if (child_pid > 0) waitpid(child_pid, NULL, 0);
-    else {
-        perror(ROJO "Error al crear proceso hijo" RESET_COLOR);
-        liberar_comandos();
-        exit(EXIT_FAILURE);
-    }
 }
 
 void guardar_comandos(){
