@@ -101,9 +101,8 @@ char ***entrada_comandos(){
                 exit(EXIT_FAILURE);
             }
 
-            comandos[comando][elemento] = (char*)malloc(sizeof(char) * (strlen(token_elementos) + 1));
+            comandos[comando][elemento] = strdup(token_elementos);
 
-            strcpy(comandos[comando][elemento],token_elementos);
             elemento++;
             token_elementos = strtok_r(NULL," ",&contexto_elemento);
         }
@@ -134,6 +133,7 @@ void liberar_comandos(){
 }
 
 void liberar_comandos_anteriores(){
+    if(comandos_anteriores == NULL) return;
     for(int i=0;comandos_anteriores[i] != NULL;i++) {
         for(int j=0;comandos_anteriores[i][j] != NULL;j++) free(comandos_anteriores[i][j]);
         free(comandos_anteriores[i]);
@@ -157,18 +157,25 @@ void sig_handler(int sig) {
 
 }
 
+void pipeling(char **comando,int posicion_pipeling){
+    printf("%sComando en Construccion\n%s",AMARILLO,RESET_COLOR);
+}
+
 void Manejar_comandos_externos(char **comando){
     pid_t child_pid = fork();
 
     // Proceso hijo
     if(child_pid == 0){
         if (execvp(comando[0], comando) == -1) perror(ROJO "Error en execvp");
+        liberar_comandos_anteriores();
+        liberar_comandos();
         exit(EXIT_FAILURE);
     }
     // Proceso padre
     else if (child_pid > 0) waitpid(child_pid, NULL, 0);
     else {
         perror(ROJO "Error al crear proceso hijo" RESET_COLOR);
+        liberar_comandos_anteriores();
         liberar_comandos();
         exit(EXIT_FAILURE);
     }
@@ -210,6 +217,9 @@ int Manejar_comandos_internos(char **comando){
         
         return 1;
     }
+    
+    for(int i=1;comando[i] != NULL;i++) if(strcmp(comando[i],"|") == 0) {pipeling(comando,i);return 1;}
+
     return 0;   //No encontro ningun Comando Interno
 }
 
