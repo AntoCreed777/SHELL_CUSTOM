@@ -157,6 +157,24 @@ void sig_handler(int sig) {
 
 }
 
+
+//A continuacion se detallan las diferentes funciones para manejar las distintas señales
+void sigterm_handler(int sig) {
+    printf(BLANCO "\nSaliendo de la SHELL\n" RESET_COLOR);
+    liberar_comandos();
+    liberar_comandos_anteriores();
+    exit(0);
+}
+
+void sigint_handler(int sig) {
+}
+
+void sigchld_handler(int sig) {
+    wait(NULL);
+}
+
+
+
 void pipeling(char **comando,int posicion_pipeling){
     printf("%sComando en Construccion\n%s",AMARILLO,RESET_COLOR);
 }
@@ -182,7 +200,7 @@ void manejar_comandos_externos(char **comando){
 }
 
 // Manejar comandos internos propios de esta SHELL
-int Manejar_comandos_internos(char **comando){
+int manejar_comandos_internos(char **comando){
     if(comando[1] == NULL && strcmp(comando[0], "exit") == 0){     //Si se escribe "exit" se termina ded ejecutar el programa
         raise(SIGTERM);
     }
@@ -265,16 +283,16 @@ void guardar_comandos(){
 }
 
 int main(){
-    signal(SIGINT, sig_handler);
-    signal(SIGCHLD, sig_handler);
-    signal(SIGTERM, sig_handler);
+    signal(SIGINT, sigint_handler);
+    signal(SIGCHLD, sigchld_handler);
+    signal(SIGTERM, sigterm_handler);
 
     while(1){
         comandos = entrada_comandos();
         if(comandos == NULL) continue;
 
         for(int i=0;comandos[i] != NULL;i++){
-            if(Manejar_comandos_internos(comandos[i])) continue;   // Si se ejecuto un comando interno que no trate de ejecutar uno externo 
+            if(manejar_comandos_internos(comandos[i])) continue;   // Si se ejecuto un comando interno que no trate de ejecutar uno externo 
 
             manejar_comandos_externos(comandos[i]);
         }
