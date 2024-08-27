@@ -19,7 +19,7 @@
 char ***comandos = NULL;
 char ***comandos_anteriores = NULL;
 
-char *Directorio_actual(){
+char *directorio_actual(){
     FILE *fp = popen("pwd","r");
 
     if (fp == NULL) return NULL;
@@ -36,29 +36,29 @@ char *Directorio_actual(){
     return ruta_actual;
 }
 
-char *Usuario_actual(){
+char *usuario_actual(){
     FILE *fp = popen("whoami","r");
     
     if (fp == NULL) return NULL;
 
     // Leer la salida del comando
     char buffer[BUFFER_SIZE];
-    char *usuario_actual = NULL;
+    char *usuario = NULL;
     if (fgets(buffer, sizeof(buffer), fp) != NULL) {
         buffer[strcspn(buffer, "\n")] = '\0';   //Busca el salto de linea y lo reemplazo por fin de linea
-        usuario_actual = strdup(buffer);
+        usuario = strdup(buffer);
     }
 
     pclose(fp);
-    return usuario_actual;
+    return usuario;
 }
 
 char ***entrada_comandos(){
-    char *ruta_actual = Directorio_actual();
-    char *usuario_actual = Usuario_actual();
-    printf("%s%s@SHELL_CUSTOM%s:%s%s%s$ %s",VERDE,usuario_actual,BLANCO,AZUL,ruta_actual,BLANCO,RESET_COLOR);   // Prompt que se muestra al esperar un comando
+    char *ruta_actual = directorio_actual();
+    char *usuario = usuario_actual();
+    printf("%s%s@SHELL_CUSTOM%s:%s%s%s$ %s",VERDE,usuario,BLANCO,AZUL,ruta_actual,BLANCO,RESET_COLOR);   // Prompt que se muestra al esperar un comando
     free(ruta_actual);
-    free(usuario_actual);
+    free(usuario);
 
     //Entrada de linea de comando
     size_t numero_bytes = 0;    //Tamano del buffer
@@ -161,7 +161,7 @@ void pipeling(char **comando,int posicion_pipeling){
     printf("%sComando en Construccion\n%s",AMARILLO,RESET_COLOR);
 }
 
-void Manejar_comandos_externos(char **comando){
+void manejar_comandos_externos(char **comando){
     pid_t child_pid = fork();
 
     // Proceso hijo
@@ -199,7 +199,7 @@ int Manejar_comandos_internos(char **comando){
 
         //Ejecucion de los comandos anteriores
 
-        for(int i=0;comandos_anteriores[i] != NULL;i++) Manejar_comandos_externos(comandos_anteriores[i]);
+        for(int i=0;comandos_anteriores[i] != NULL;i++) manejar_comandos_externos(comandos_anteriores[i]);
 
         return 1;
     }
@@ -276,7 +276,7 @@ int main(){
         for(int i=0;comandos[i] != NULL;i++){
             if(Manejar_comandos_internos(comandos[i])) continue;   // Si se ejecuto un comando interno que no trate de ejecutar uno externo 
 
-            Manejar_comandos_externos(comandos[i]);
+            manejar_comandos_externos(comandos[i]);
         }
 
         guardar_comandos();
