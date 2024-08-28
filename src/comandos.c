@@ -10,11 +10,7 @@
 #include "colores.h"
 
 char ***entrada_comandos(){
-    char *ruta_actual = directorio_actual();
-    char *usuario = usuario_actual();
-    printf("%s%s@SHELL_CUSTOM%s:%s%s%s$ %s",VERDE,usuario,BLANCO,AZUL,ruta_actual,BLANCO,RESET_COLOR);   // Prompt que se muestra al esperar un comando
-    free(ruta_actual);
-    free(usuario);
+    mostrar_prompt();
 
     //Entrada de linea de comando
     size_t numero_bytes = 0;    //Tamano del buffer

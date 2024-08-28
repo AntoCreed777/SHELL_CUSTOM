@@ -3,7 +3,6 @@
 extern char ***comandos;
 extern char ***comandos_anteriores;
 
-
 char ***entrada_comandos();
 
 void liberar_comandos();

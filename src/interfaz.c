@@ -47,3 +47,12 @@ char *usuario_actual(){
     return usuario;
 }
 
+
+void mostrar_prompt(){
+    char *ruta_actual = directorio_actual();
+    char *usuario = usuario_actual();
+    printf("%s%s@SHELL_CUSTOM%s:%s%s%s$ %s", VERDE, usuario, BLANCO, AZUL, ruta_actual, BLANCO, RESET_COLOR); // Prompt que se muestra al esperar un comando
+    free(ruta_actual);
+    free(usuario);
+}
+
