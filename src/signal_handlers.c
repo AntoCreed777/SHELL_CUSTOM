@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <signal.h>
 #include "signal_handlers.h"
+#include "interfaz.h"
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/wait.h>
 
 void sig_handler(int sig) {
     if(sig == SIGTERM){
