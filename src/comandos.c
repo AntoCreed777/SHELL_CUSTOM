@@ -1,57 +1,13 @@
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
-#include <string.h>
 #include <signal.h>
+#include <sys/types.h>
+#include <string.h>
+#include <unistd.h>
 #include <sys/wait.h>
-
-#define BUFFER_SIZE 1024
-
-#define ROJO        "\033[0;31m"
-#define VERDE       "\033[0;32m"
-#define AMARILLO    "\033[0;33m"
-#define AZUL        "\033[0;34m"
-#define MAGENTA     "\033[1;35m"
-#define CIAN        "\033[1;36m"
-#define BLANCO      "\033[1;37m"
-#define RESET_COLOR "\033[0m"
-
-char ***comandos = NULL;
-char ***comandos_anteriores = NULL;
-
-char *directorio_actual(){
-    FILE *fp = popen("pwd","r");
-
-    if (fp == NULL) return NULL;
-
-    // Leer la salida del comando
-    char buffer[BUFFER_SIZE];
-    char *ruta_actual = NULL;
-    if (fgets(buffer, sizeof(buffer), fp) != NULL) {
-        buffer[strcspn(buffer, "\n")] = '\0';   //Busca el salto de linea y lo reemplazo por fin de linea
-        ruta_actual = strdup(buffer);
-    }
-    
-    pclose(fp);
-    return ruta_actual;
-}
-
-char *usuario_actual(){
-    FILE *fp = popen("whoami","r");
-    
-    if (fp == NULL) return NULL;
-
-    // Leer la salida del comando
-    char buffer[BUFFER_SIZE];
-    char *usuario = NULL;
-    if (fgets(buffer, sizeof(buffer), fp) != NULL) {
-        buffer[strcspn(buffer, "\n")] = '\0';   //Busca el salto de linea y lo reemplazo por fin de linea
-        usuario = strdup(buffer);
-    }
-
-    pclose(fp);
-    return usuario;
-}
+#include "comandos.h"
+#include "interfaz.h"
+#include "colores.h"
 
 char ***entrada_comandos(){
     char *ruta_actual = directorio_actual();
@@ -141,43 +97,11 @@ void liberar_comandos_anteriores(){
     free(comandos_anteriores);
 }
 
-// Manejador de signals
-void sig_handler(int sig) {
-    if(sig == SIGTERM){
-        printf(BLANCO "\nSaliendo de la SHELL\n" RESET_COLOR);
-        liberar_comandos();
-        liberar_comandos_anteriores();
-        exit(0);
-    }
-    else if(sig == SIGINT){}
-    else if(sig == SIGCHLD){
-        wait(NULL); // Espera al proceso hijo que ha terminado
-        //printf(BLANCO "\nProceso hijo terminado\n" RESET_COLOR);
-    }
-
-}
-
-
-//A continuacion se detallan las diferentes funciones para manejar las distintas señales
-void sigterm_handler(int sig) {
-    printf(BLANCO "\nSaliendo de la SHELL\n" RESET_COLOR);
-    liberar_comandos();
-    liberar_comandos_anteriores();
-    exit(0);
-}
-
-void sigint_handler(int sig) {
-}
-
-void sigchld_handler(int sig) {
-    wait(NULL);
-}
-
-
 
 void pipeling(char **comando,int posicion_pipeling){
     printf("%sComando en Construccion\n%s",AMARILLO,RESET_COLOR);
 }
+
 
 void manejar_comandos_externos(char **comando){
     pid_t child_pid = fork();
@@ -282,24 +206,3 @@ void guardar_comandos(){
     comandos_anteriores[num_comandos] = NULL;
 }
 
-int main(){
-    signal(SIGINT, sigint_handler);
-    signal(SIGCHLD, sigchld_handler);
-    signal(SIGTERM, sigterm_handler);
-
-    while(1){
-        comandos = entrada_comandos();
-        if(comandos == NULL) continue;
-
-        for(int i=0;comandos[i] != NULL;i++){
-            if(manejar_comandos_internos(comandos[i])) continue;   // Si se ejecuto un comando interno que no trate de ejecutar uno externo 
-
-            manejar_comandos_externos(comandos[i]);
-        }
-
-        guardar_comandos();
-        liberar_comandos();
-    }
-
-    return 0;
-}
