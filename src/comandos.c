@@ -5,9 +5,11 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <stdbool.h>
 #include "comandos.h"
 #include "interfaz.h"
 #include "colores.h"
+#include "utils.h"
 
 char ***entrada_comandos(){
     mostrar_prompt();
@@ -17,11 +19,13 @@ char ***entrada_comandos(){
     char *cadena = NULL;
     int buffer_leido = getline(&cadena, &numero_bytes, stdin);
 
+    
     if (buffer_leido == -1){
         printf(ROJO "ERROR AL LEER INPUT" RESET_COLOR);
         return NULL;
     }
-    else if(buffer_leido == 1) return NULL; //Si no se ingresa ningun comando, (solamente ingresa '\n')
+    if(is_empty_linea(cadena)) 
+        return NULL; //Si no se ingresa ningun comando, (solamente ingresa '\n')
 
     //Extraccion de las distintas partes del comando
     char ***comandos = NULL;
