@@ -98,28 +98,105 @@ void liberar_comandos_anteriores(){
 }
 
 
-void pipeling(char **comando,int posicion_pipeling){
-    printf("%sComando en Construccion\n%s",AMARILLO,RESET_COLOR);
-}
-
-
 void manejar_comandos_externos(char **comando){
-    pid_t child_pid = fork();
-
-    // Proceso hijo
-    if(child_pid == 0){
-        if (execvp(comando[0], comando) == -1) perror(ROJO "Error en execvp");
-        liberar_comandos_anteriores();
-        liberar_comandos();
-        exit(EXIT_FAILURE);
+    int num_pipe = 0;
+    int i = 0;
+    
+    // Contar el número de pipes
+    while (comando[i] != NULL) {
+        if (strcmp(comando[i], "|") == 0) {
+            num_pipe++;
+        }
+        i++;
     }
-    // Proceso padre
-    else if (child_pid > 0) waitpid(child_pid, NULL, 0);
-    else {
-        perror(ROJO "Error al crear proceso hijo" RESET_COLOR);
-        liberar_comandos_anteriores();
-        liberar_comandos();
-        exit(EXIT_FAILURE);
+
+    // Caso sin pipes
+    if (num_pipe == 0) {
+        pid_t c_pid = fork();
+
+        if (c_pid == 0) {
+            execvp(comando[0], comando);
+            perror("execvp");  // Se muestra solo si execvp falla
+            exit(EXIT_FAILURE);  // Terminar si execvp falla
+        } else if (c_pid > 0) {
+            waitpid(c_pid, NULL, 0);
+        } else {
+            perror("fork");
+            exit(EXIT_FAILURE);
+        }
+        return;
+    }
+
+    // Crear pipes
+    int pidfc[num_pipe][2];
+    for (int j = 0; j < num_pipe; j++) {
+        if (pipe(pidfc[j]) == -1) {
+            perror("pipe");
+            exit(EXIT_FAILURE);
+        }
+    }
+    
+    // Ejecutar comandos con pipes
+    i = 0;
+    int j = 0;  // Índice de pipes
+
+    while (comando[i] != NULL) {
+        char *comando_actual[1024] = {NULL};  // Inicializar a NULL
+        int contador_argumento = 0;
+        
+        // Extraer el comando actual hasta el próximo pipe o el final
+        while (comando[i] != NULL && strcmp(comando[i], "|") != 0) {
+            comando_actual[contador_argumento] = comando[i];
+            i++, contador_argumento++;
+        }
+        comando_actual[contador_argumento] = NULL;
+        
+        // Saltar el pipe si existe
+        if (comando[i] != NULL && strcmp(comando[i], "|") == 0) i++;
+
+        pid_t pid = fork();
+        if (pid == 0) {
+            // Redirigir la entrada para todos menos el primer comando
+            if (j > 0) {
+                if (dup2(pidfc[j - 1][0], STDIN_FILENO) == -1) {
+                    perror("dup2 input");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            
+            // Redirigir la salida para todos menos el último comando
+            if (j < num_pipe) {
+                if (dup2(pidfc[j][1], STDOUT_FILENO) == -1) {
+                    perror("dup2 output");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            
+            // Cerrar todos los pipes en el proceso hijo
+            for (int n = 0; n < num_pipe; n++) {
+                close(pidfc[n][0]);
+                close(pidfc[n][1]);
+            }
+
+            execvp(comando_actual[0], comando_actual);
+            perror("execvp");  // Se muestra solo si execvp falla
+            exit(EXIT_FAILURE);  // Terminar si execvp falla
+        } else if (pid < 0) {
+            perror("fork");
+            exit(EXIT_FAILURE);
+        }
+        j++;
+    }
+
+    // Proceso padre cierra todos los descriptores de pipes
+    for (int j = 0; j < num_pipe; j++) {
+        close(pidfc[j][0]);
+        close(pidfc[j][1]);
+    }
+
+    // Esperar a que todos los procesos hijos terminen
+    for (int j = 0; j <= num_pipe; j++) {
+        wait(NULL);
     }
 }
 
@@ -159,8 +236,6 @@ int manejar_comandos_internos(char **comando){
         
         return 1;
     }
-    
-    for(int i=1;comando[i] != NULL;i++) if(strcmp(comando[i],"|") == 0) {pipeling(comando,i);return 1;}
 
     return 0;   //No encontro ningun Comando Interno
 }
