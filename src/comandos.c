@@ -138,7 +138,7 @@ void manejar_comandos_externos(char **comando){
     
     // Ejecutar comandos con pipes
     i = 0;
-    int j = 0;  // Índice de pipes
+    int indice_pipes = 0;  // Índice de pipes
 
     while (comando[i] != NULL) {
         char *comando_actual[1024] = {NULL};  // Inicializar a NULL
@@ -157,16 +157,16 @@ void manejar_comandos_externos(char **comando){
         pid_t pid = fork();
         if (pid == 0) {
             // Redirigir la entrada para todos menos el primer comando
-            if (j > 0) {
-                if (dup2(pidfc[j - 1][0], STDIN_FILENO) == -1) {
+            if (indice_pipes > 0) {
+                if (dup2(pidfc[indice_pipes - 1][0], STDIN_FILENO) == -1) {
                     perror("dup2 input");
                     exit(EXIT_FAILURE);
                 }
             }
             
             // Redirigir la salida para todos menos el último comando
-            if (j < num_pipe) {
-                if (dup2(pidfc[j][1], STDOUT_FILENO) == -1) {
+            if (indice_pipes < num_pipe) {
+                if (dup2(pidfc[indice_pipes][1], STDOUT_FILENO) == -1) {
                     perror("dup2 output");
                     exit(EXIT_FAILURE);
                 }
@@ -185,13 +185,13 @@ void manejar_comandos_externos(char **comando){
             perror("fork");
             exit(EXIT_FAILURE);
         }
-        j++;
+        indice_pipes++;
     }
 
     // Proceso padre cierra todos los descriptores de pipes
-    for (int j = 0; j < num_pipe; j++) {
-        close(pidfc[j][0]);
-        close(pidfc[j][1]);
+    for (int indice_pipes = 0; indice_pipes < num_pipe; indice_pipes++) {
+        close(pidfc[indice_pipes][0]);
+        close(pidfc[indice_pipes][1]);
     }
 
     // Esperar a que todos los procesos hijos terminen
