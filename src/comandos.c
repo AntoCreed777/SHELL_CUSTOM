@@ -97,7 +97,6 @@ void liberar_comandos_anteriores(){
     free(comandos_anteriores);
 }
 
-
 void manejar_comandos_externos(char **comando){
     int num_pipe = 0;
     int i = 0;
@@ -234,6 +233,33 @@ int manejar_comandos_internos(char **comando){
         }
         else if (chdir(comando[1]) != 0) perror(ROJO "Error al ingresar al Directorio" RESET_COLOR);
         
+        return 1;
+    }
+
+    if(strcmp(comando[0], "set") == 0){
+        if(comando[1] == NULL || comando[2] == NULL) printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
+        
+        else if(strcmp(comando[2], "help") == 0) printf("set recordatorio [time] [mensaje]\n"); //Ayuda de como es la estructura del comando
+
+        else if(comando[3] == NULL) printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
+
+        else{
+            pid_t pid = fork();
+
+            if (pid == 0) {     //Proceso hijo
+                sleep(atoi(comando[2]));
+                printf("\n" AMARILLO "ALARMA" RESET_COLOR ":" MAGENTA " %s" RESET_COLOR "\n", comando[3]);
+                mostrar_prompt();
+                exit(0);
+            }
+            else if (pid < 0) {
+                perror("Error al crear el proceso hijo");
+                exit(1);
+            }
+
+            printf(AMARILLO"Alarma configurada para dentro de %d segundos."RESET_COLOR"\n"RESET_COLOR, atoi(comando[2]));
+        }
+
         return 1;
     }
 
