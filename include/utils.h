@@ -4,3 +4,4 @@
 
 
 bool is_empty_linea(char* linea);
+bool is_number(char* linea);
