@@ -102,12 +102,8 @@ void manejar_comandos_externos(char **comando){
     int i = 0;
     
     // Contar el número de pipes
-    while (comando[i] != NULL) {
-        if (strcmp(comando[i], "|") == 0) {
-            num_pipe++;
-        }
-        i++;
-    }
+    for (i = 0; comando[i] != NULL; i++) 
+        if (strcmp(comando[i], "|") == 0) num_pipe++;
 
     // Caso sin pipes
     if (num_pipe == 0) {
@@ -144,10 +140,7 @@ void manejar_comandos_externos(char **comando){
         int contador_argumento = 0;
         
         // Extraer el comando actual hasta el próximo pipe o el final
-        while (comando[i] != NULL && strcmp(comando[i], "|") != 0) {
-            comando_actual[contador_argumento] = comando[i];
-            i++, contador_argumento++;
-        }
+        while (comando[i] != NULL && strcmp(comando[i], "|") != 0) comando_actual[contador_argumento++] = comando[i++];
         comando_actual[contador_argumento] = NULL;
         
         // Saltar el pipe si existe
@@ -250,7 +243,9 @@ int manejar_comandos_internos(char **comando){
 
             if (pid == 0) {     //Proceso hijo
                 sleep(atoi(comando[2]));
-                printf("\n" AMARILLO "ALARMA" RESET_COLOR ":" MAGENTA " %s" RESET_COLOR "\n", comando[3]);
+                printf("\n" AMARILLO "ALARMA" RESET_COLOR ": " MAGENTA);
+                int contador = 3;
+                while (comando[contador] != NULL) printf("%s ", comando[contador++]);
                 mostrar_prompt();
                 exit(0);
             }
