@@ -194,7 +194,7 @@ void manejar_comandos_externos(char **comando){
 
 // Manejar comandos internos propios de esta SHELL
 int manejar_comandos_internos(char **comando){
-    if(comando[1] == NULL && strcmp(comando[0], "exit") == 0){     //Si se escribe "exit" se termina ded ejecutar el programa
+    if(strcmp(comando[0], "exit") == 0){     //Si se escribe "exit" se termina ded ejecutar el programa
         raise(SIGTERM);
     }
 
@@ -246,6 +246,7 @@ int manejar_comandos_internos(char **comando){
                 printf("\n" AMARILLO "ALARMA" RESET_COLOR ": " MAGENTA);
                 int contador = 3;
                 while (comando[contador] != NULL) printf("%s ", comando[contador++]);
+                printf("\n");
                 mostrar_prompt();
                 exit(0);
             }
@@ -255,6 +256,60 @@ int manejar_comandos_internos(char **comando){
             }
 
             printf(AMARILLO"Alarma configurada para dentro de %d segundos."RESET_COLOR"\n"RESET_COLOR, atoi(comando[2]));
+        }
+
+        return 1;
+    }
+
+    if(strcmp(comando[0], "favs") == 0){
+        if(comando[1] == NULL) printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
+
+        else if(strcmp(comando[1], "help") == 0){
+            printf(AMARILLO "Lista de argumentos disponibles:\n" AZUL " mostrar\n" " eliminar " ROJO "num1,num2\n" AZUL " buscar "
+                    ROJO "cmd\n" AZUL " borrar\n" " ejecutar " ROJO "num\n" AZUL " cargar\n" " guardar\n" RESET_COLOR);
+        }
+
+        else if(strcmp(comando[1], "mostrar") == 0){    //favs mostrar (despliega la lista comandos existentes en la lista con su respectivo número)
+
+        }
+
+        else if(strcmp(comando[1], "eliminar") == 0){   //favs eliminar num1,num2 (Eliminar comandos asociados a los números entregados entrecomas)
+            if(comando[2] == NULL) {
+                printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
+                return 1;
+            }
+
+
+        }
+
+        else if(strcmp(comando[1], "buscar") == 0){     //favs buscar cmd (Busca comandos que contengan substring cmd en la lista de favoritos y los despliega en pantalla junto con su número asociado)
+            if(comando[2] == NULL) {
+                printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
+                return 1;
+            }
+            
+
+        }
+
+        else if(strcmp(comando[1], "borrar") == 0){     //favs borrar (Borra todos los comandos en la lista de favoritos)
+
+        }
+
+        else if(strcmp(comando[1], "ejecutar") == 0){   //favs num ejecutar (Ejecuta el comando, cuyo número en la lista es num) //INVERTI EL ORDEN DE LOS ARGUMENTOS
+            if(comando[2] == NULL) {
+                printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
+                return 1;
+            }
+            
+
+        }
+
+        else if(strcmp(comando[1], "cargar") == 0){     //favs cargar (Lee comandos de archivo de favoritos, los mantiene en memoria y los despliega en pantalla)
+
+        }
+
+        else if(strcmp(comando[1], "guardar") == 0){    //favs guardar (Guarda comandos agregados en sesión de shell actual)
+
         }
 
         return 1;
