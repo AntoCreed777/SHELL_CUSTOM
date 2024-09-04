@@ -20,8 +20,6 @@ void sigterm_handler(int sig) {
 }
 
 void sigint_handler(int sig) {
-    printf("\nInterrupción recibida.\n");
-
     if(c_pid == -1) return;
 
     pid_t pgrp = getpgrp();  // Obtener el ID del grupo de procesos

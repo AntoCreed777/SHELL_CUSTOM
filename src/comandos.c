@@ -276,7 +276,7 @@ int manejar_comandos_internos(char **comando){
         }
 
         else if(strcmp(comando[1], "mostrar") == 0){    //favs mostrar (despliega la lista comandos existentes en la lista con su respectivo número)
-
+            mostrar_favs();
         }
 
         else if(strcmp(comando[1], "eliminar") == 0){   //favs eliminar num1,num2 (Eliminar comandos asociados a los números entregados entrecomas)
@@ -437,4 +437,26 @@ void eliminar_favs(){
         perror("Error al eliminar el archivo");
         exit(EXIT_FAILURE);
     }
+}
+
+void mostrar_favs(){
+    printf("Comandos Favoritos:\n");
+    if(access(archivo_favs, F_OK) != 0) return; //Si no existe el archivo
+
+    FILE *file = fopen(archivo_favs,"r");
+    if (file == NULL) {
+        perror("Error al abrir el archivo");
+        liberar_comandos();
+        liberar_comandos_anteriores();
+        exit(EXIT_FAILURE);
+    }
+
+    int contador = 1;
+    char buffer[BUFFER_SIZE];
+    while (fgets(buffer, sizeof(buffer), file) != NULL) {
+        buffer[strcspn(buffer, ";")] = 0;  // Eliminar el salto de línea
+        printf(AZUL"%d: " ROJO "%s\n" RESET_COLOR, contador++, buffer);
+    }
+
+    fclose(file);
 }
