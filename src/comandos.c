@@ -298,7 +298,7 @@ int manejar_comandos_internos(char **comando){
         }
 
         else if(strcmp(comando[1], "borrar") == 0){     //favs borrar (Borra todos los comandos en la lista de favoritos)
-            eliminar_favs();
+            borrar_favs();
         }
 
         else if(strcmp(comando[1], "ejecutar") == 0){   //favs num ejecutar (Ejecuta el comando, cuyo número en la lista es num) //INVERTI EL ORDEN DE LOS ARGUMENTOS
@@ -431,7 +431,7 @@ void guardar_favs(){
     fclose(destinoFile);
 }
 
-void eliminar_favs(){
+void borrar_favs(){
     if(access(archivo_favs, F_OK) != 0) return; //Si no existe el archivo
 
     if (remove(archivo_favs) != 0){

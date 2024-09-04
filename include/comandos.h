@@ -17,6 +17,6 @@ void guardar_comandos();
 void guardar_cache();
 void eliminar_cache();
 void guardar_favs();
-void eliminar_favs();
+void borrar_favs();
 void mostrar_favs();
 void cargar_favs();
