@@ -311,7 +311,8 @@ int manejar_comandos_internos(char **comando){
         }
 
         else if(strcmp(comando[1], "cargar") == 0){     //favs cargar (Lee comandos de archivo de favoritos, los mantiene en memoria y los despliega en pantalla)
-
+            cargar_favs();
+            mostrar_favs();
         }
 
         else if(strcmp(comando[1], "guardar") == 0){    //favs guardar (Guarda comandos agregados en sesión de shell actual)
@@ -459,4 +460,35 @@ void mostrar_favs(){
     }
 
     fclose(file);
+}
+
+void cargar_favs(){
+    FILE *origenFile = fopen(archivo_favs, "rb");
+    if (origenFile == NULL) {
+        perror("No se pudo abrir el archivo de origen");
+        liberar_comandos();
+        liberar_comandos_anteriores();
+        eliminar_cache();
+        exit(EXIT_FAILURE);
+    }
+
+    FILE *destinoFile = fopen(archivo_cache, "ab");
+    if (destinoFile == NULL) {
+        perror("No se pudo abrir el archivo de destino");
+        fclose(origenFile);
+        liberar_comandos();
+        liberar_comandos_anteriores();
+        eliminar_cache();
+        exit(EXIT_FAILURE);
+    }
+
+    char buffer[BUFFER_SIZE];
+    size_t bytesRead;
+
+    // Leer del archivo de origen y escribir en el archivo de destino
+    while ((bytesRead = fread(buffer, 1, sizeof(buffer), origenFile)) > 0)
+        fwrite(buffer, 1, bytesRead, destinoFile);
+
+    fclose(origenFile);
+    fclose(destinoFile);
 }

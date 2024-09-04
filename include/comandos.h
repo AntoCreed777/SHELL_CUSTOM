@@ -19,3 +19,4 @@ void eliminar_cache();
 void guardar_favs();
 void eliminar_favs();
 void mostrar_favs();
+void cargar_favs();
