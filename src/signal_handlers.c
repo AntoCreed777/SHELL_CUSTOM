@@ -17,6 +17,12 @@ void sigterm_handler(int sig) {
 }
 
 void sigint_handler(int sig) {
+    if(kill(0,SIGKILL) < 0){
+        printf(ROJO "Ocurrio un error al matar a procesos hijos" RESET_COLOR);
+        liberar_comandos();
+        liberar_comandos_anteriores();
+        exit(EXIT_FAILURE);
+    }
 }
 
 void sigchld_handler(int sig) {
