@@ -271,9 +271,26 @@ int manejar_comandos_internos(char **comando){
         if(comando[1] == NULL) printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
 
         else if(strcmp(comando[1], "help") == 0){
-            printf(AMARILLO "Lista de argumentos disponibles:\n" AZUL " mostrar\n" " eliminar " ROJO "num1,num2\n" AZUL " buscar "
-                    ROJO "cmd\n" AZUL " borrar\n" " ejecutar " ROJO "num\n" AZUL " cargar\n" " guardar\n" RESET_COLOR);
+            printf(AMARILLO "Lista de argumentos disponibles:\n"
+            AZUL " crear " ROJO " ruta/ejemplo.csv\n"
+            AZUL " mostrar\n" " eliminar " ROJO "num1,num2\n"
+            AZUL " buscar " ROJO "cmd\n"
+            AZUL " borrar\n"
+            AZUL " ejecutar " ROJO "num\n"
+            AZUL " cargar\n"
+            AZUL " guardar\n"
+            RESET_COLOR);
         }
+
+        else if(strcmp(comando[1], "crear") == 0){    //favs mostrar (despliega la lista comandos existentes en la lista con su respectivo número)
+            if(comando[2] == NULL) {
+                printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
+                return 1;
+            }
+
+
+        }
+
 
         else if(strcmp(comando[1], "mostrar") == 0){    //favs mostrar (despliega la lista comandos existentes en la lista con su respectivo número)
             mostrar_favs();
