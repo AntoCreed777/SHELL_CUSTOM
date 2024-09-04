@@ -10,8 +10,12 @@
 #include "interfaz.h"
 #include "colores.h"
 #include "utils.h"
+#define BUFFER_SIZE 1024
 
 pid_t c_pid = -1;
+const char *archivo_cache = "cache.csv";
+const char *archivo_favs = "favs.csv";
+
 
 char ***entrada_comandos(){
     mostrar_prompt();
@@ -294,7 +298,7 @@ int manejar_comandos_internos(char **comando){
         }
 
         else if(strcmp(comando[1], "borrar") == 0){     //favs borrar (Borra todos los comandos en la lista de favoritos)
-
+            eliminar_favs();
         }
 
         else if(strcmp(comando[1], "ejecutar") == 0){   //favs num ejecutar (Ejecuta el comando, cuyo número en la lista es num) //INVERTI EL ORDEN DE LOS ARGUMENTOS
@@ -311,7 +315,7 @@ int manejar_comandos_internos(char **comando){
         }
 
         else if(strcmp(comando[1], "guardar") == 0){    //favs guardar (Guarda comandos agregados en sesión de shell actual)
-
+            guardar_favs();
         }
 
         return 1;
@@ -365,3 +369,72 @@ void guardar_comandos(){
     comandos_anteriores[num_comandos] = NULL;
 }
 
+void guardar_cache(){
+    FILE *file = fopen(archivo_cache,"a+");
+    if (file == NULL) {
+        perror("Error al abrir el archivo");
+        liberar_comandos();
+        liberar_comandos_anteriores();
+        exit(EXIT_FAILURE);
+    }
+
+    
+    for(int i=0;comandos[i] != NULL;i++){
+        for(int j=0;comandos[i][j] != NULL;j++){
+            fprintf(file,"%s ",comandos[i][j]);
+        }
+        fprintf(file,";\n");
+
+    }
+
+    fclose(file);
+}
+
+void eliminar_cache(){
+    if(access(archivo_cache, F_OK) != 0) return; //Si no existe el archivo
+
+    if (remove(archivo_cache) != 0){
+        perror("Error al eliminar el archivo");
+        exit(EXIT_FAILURE);
+    }
+}
+
+void guardar_favs(){
+    FILE *origenFile = fopen(archivo_cache, "rb");
+    if (origenFile == NULL) {
+        perror("No se pudo abrir el archivo de origen");
+        liberar_comandos();
+        liberar_comandos_anteriores();
+        eliminar_cache();
+        exit(EXIT_FAILURE);
+    }
+
+    FILE *destinoFile = fopen(archivo_favs, "ab");
+    if (destinoFile == NULL) {
+        perror("No se pudo abrir el archivo de destino");
+        fclose(origenFile);
+        liberar_comandos();
+        liberar_comandos_anteriores();
+        eliminar_cache();
+        exit(EXIT_FAILURE);
+    }
+
+    char buffer[BUFFER_SIZE];
+    size_t bytesRead;
+
+    // Leer del archivo de origen y escribir en el archivo de destino
+    while ((bytesRead = fread(buffer, 1, sizeof(buffer), origenFile)) > 0)
+        fwrite(buffer, 1, bytesRead, destinoFile);
+
+    fclose(origenFile);
+    fclose(destinoFile);
+}
+
+void eliminar_favs(){
+    if(access(archivo_favs, F_OK) != 0) return; //Si no existe el archivo
+
+    if (remove(archivo_favs) != 0){
+        perror("Error al eliminar el archivo");
+        exit(EXIT_FAILURE);
+    }
+}

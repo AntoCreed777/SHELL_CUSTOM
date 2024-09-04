@@ -15,6 +15,7 @@ void sigterm_handler(int sig) {
     printf(BLANCO "\nSaliendo de la SHELL\n" RESET_COLOR);
     liberar_comandos();
     liberar_comandos_anteriores();
+    eliminar_cache();
     exit(0);
 }
 

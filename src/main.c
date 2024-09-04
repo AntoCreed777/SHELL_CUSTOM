@@ -26,6 +26,7 @@ int main(){
         }
 
         guardar_comandos();
+        guardar_cache();
         liberar_comandos();
     }
 
