@@ -319,14 +319,18 @@ int manejar_comandos_internos(char **comando){
 }
 
 void guardar_comandos(){
-    if(strcmp(comandos[0][0],"!!") == 0) return;
+    if(strcmp(comandos[0][0],"!!") == 0 || strcmp(comandos[0][0],"favs") == 0) return;
     
     if(comandos_anteriores != NULL) liberar_comandos_anteriores();
     comandos_anteriores = NULL;
 
-    int num_comandos = 0;
+    int num_comandos = 0, num_invalidos = 0;
 
-    while(comandos[num_comandos] != NULL) {   // Comandos
+    while(comandos[num_comandos + num_invalidos] != NULL) {   // Comandos
+        if(strcmp(comandos[num_comandos + num_invalidos][0],"!!") == 0 || strcmp(comandos[num_comandos + num_invalidos][0],"favs") == 0) {
+            num_invalidos++;
+            continue;
+        }
 
         comandos_anteriores = (char***)realloc(comandos_anteriores,sizeof(char**) * (num_comandos+1));
         
@@ -340,7 +344,7 @@ void guardar_comandos(){
 
         int num_elementos = 0;
 
-        while(comandos[num_comandos][num_elementos] != NULL){    // Elementos del Comando
+        while(comandos[num_comandos + num_invalidos][num_elementos] != NULL){    // Elementos del Comando
             comandos_anteriores[num_comandos] = (char**)realloc(comandos_anteriores[num_comandos],sizeof(char*) * (num_elementos+1));
             
             if(comandos_anteriores[num_comandos] == NULL){
@@ -348,7 +352,7 @@ void guardar_comandos(){
                 exit(EXIT_FAILURE);
             }
 
-            comandos_anteriores[num_comandos][num_elementos] = strdup(comandos[num_comandos][num_elementos]);
+            comandos_anteriores[num_comandos][num_elementos] = strdup(comandos[num_comandos + num_invalidos][num_elementos]);
             num_elementos++;
         }
         comandos_anteriores[num_comandos] = (char**)realloc(comandos_anteriores[num_comandos],sizeof(char*) * (num_elementos+1));
