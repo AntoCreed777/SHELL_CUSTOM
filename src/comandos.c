@@ -11,6 +11,8 @@
 #include "colores.h"
 #include "utils.h"
 
+pid_t c_pid = -1;
+
 char ***entrada_comandos(){
     mostrar_prompt();
 
@@ -107,7 +109,7 @@ void manejar_comandos_externos(char **comando){
 
     // Caso sin pipes
     if (num_pipe == 0) {
-        pid_t c_pid = fork();
+        c_pid = fork();
 
         if (c_pid == 0) {
             execvp(comando[0], comando);
@@ -146,8 +148,8 @@ void manejar_comandos_externos(char **comando){
         // Saltar el pipe si existe
         if (comando[i] != NULL && strcmp(comando[i], "|") == 0) i++;
 
-        pid_t pid = fork();
-        if (pid == 0) {
+        c_pid = fork();
+        if (c_pid == 0) {
             // Redirigir la entrada para todos menos el primer comando
             if (indice_pipes > 0) {
                 if (dup2(pidfc[indice_pipes - 1][0], STDIN_FILENO) == -1) {
@@ -173,7 +175,7 @@ void manejar_comandos_externos(char **comando){
             execvp(comando_actual[0], comando_actual);
             perror("execvp");  // Se muestra solo si execvp falla
             exit(EXIT_FAILURE);  // Terminar si execvp falla
-        } else if (pid < 0) {
+        } else if (c_pid < 0) {
             perror("fork");
             exit(EXIT_FAILURE);
         }
