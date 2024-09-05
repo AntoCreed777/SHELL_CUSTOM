@@ -15,6 +15,8 @@ int main(){
     signal(SIGCHLD, sigchld_handler);
     signal(SIGTERM, sigterm_handler);
 
+    cargar_ruta_favs();
+
     while(1){
         comandos = entrada_comandos();
         if(comandos == NULL) continue;

@@ -21,3 +21,5 @@ void cargar_favs();
 void eliminar_favs(int numero);
 void buscar_favs(char *busqueda);
 void ejecutar_favs(int numero);
+void guardar_ruta_favs();
+void cargar_ruta_favs();

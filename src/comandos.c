@@ -13,7 +13,9 @@
 #define BUFFER_SIZE 1024
 
 pid_t c_pid = -1;
-const char *archivo_favs = "favs.csv";
+char *archivo_favs = "favs.csv";  //Archivo donde se guarda la lista de favoritos
+const char *direccion_favs = "direccion_favs.txt";  //Archivo donde se guarda la direccion del archivo de favoritos
+
 int indice_inicio_anterior_linea_comando = 0;
 
 char ***entrada_comandos(){
@@ -282,14 +284,21 @@ int manejar_comandos_internos(char **comando){
             RESET_COLOR);
         }
 
-        else if(strcmp(comando[1], "crear") == 0){    //favs mostrar (despliega la lista comandos existentes en la lista con su respectivo número)
+        else if(strcmp(comando[1], "crear") == 0){    //Crea archivo donde se almacenan los comandos favoritos
             if(comando[2] == NULL) {
                 printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
                 return 1;
             }
+
+            FILE *file = fopen(comando[2],"w");
+            if (file == NULL) printf(ROJO "Error al crear el archivo" RESET_COLOR "\n");
+            else {
+                fclose(file);
+                archivo_favs = strdup(comando[2]);
+                guardar_ruta_favs();
+                printf(AMARILLO "Archivo creado exitosamente" RESET_COLOR "\n");
+            }
         }
-
-
         else if(strcmp(comando[1], "mostrar") == 0){    //favs mostrar (despliega la lista comandos existentes en la lista con su respectivo número)
             mostrar_favs();
         }
@@ -421,11 +430,21 @@ void guardar_favs(){
 }
 
 void borrar_favs(){
+    printf(AMARILLO "Borrando Archivo: %s\n" RESET_COLOR, archivo_favs);
+
     if(access(archivo_favs, F_OK) != 0) return; //Si no existe el archivo
 
     if (remove(archivo_favs) != 0){
-        perror("Error al eliminar el archivo");
+        perror("Error al eliminar el archivo de favoritos");
         exit(EXIT_FAILURE);
+    }
+    else{
+        if(access(direccion_favs, F_OK) != 0) return; //Si no existe el archivo
+
+        if (remove(direccion_favs) != 0){
+            perror("Error al eliminar el archivo de dirección de favoritos");
+            exit(EXIT_FAILURE);
+        }
     }
 }
 
@@ -623,4 +642,36 @@ void ejecutar_favs(int numero){
         }
     }
     fclose(origenFile);
+}
+
+void guardar_ruta_favs(){
+        FILE *file = fopen(direccion_favs, "w");
+        if (file == NULL) {
+            perror("Error al abrir el archivo de dirección de favoritos");
+            liberar_comandos();
+            liberar_cache();
+            exit(EXIT_FAILURE);
+        }
+        fputs(archivo_favs, file);
+        fclose(file);
+}
+
+void cargar_ruta_favs(){
+    printf(AMARILLO "Cargando archivo de favoritos...\n" RESET_COLOR);
+    FILE *file = fopen(direccion_favs, "r");
+    if (file == NULL) {
+        perror(ROJO "Error al abrir el archivo de dirección de favoritos" RESET_COLOR);
+        printf(AMARILLO "Se creará/usara un archivo de favoritos por defecto.\n" RESET_COLOR);
+    }
+    else{
+        archivo_favs = (char*)malloc(256 * sizeof(char));  // Reserva espacio para 256 caracteres
+        if (archivo_favs == NULL) {
+            perror("Error al asignar memoria para archivo_favs");
+            liberar_comandos();
+            liberar_cache();
+            exit(EXIT_FAILURE);
+        }
+        fscanf(file, "%s", archivo_favs);
+        fclose(file);
+    }
 }
