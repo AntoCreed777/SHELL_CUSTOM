@@ -301,8 +301,8 @@ int manejar_comandos_internos(char **comando){
                 printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
                 return 1;
             }
-
-
+            int numero_elimminar = atoi(comando[2]);
+            eliminar_favs(numero_elimminar);
         }
 
         else if(strcmp(comando[1], "buscar") == 0){     //favs buscar cmd (Busca comandos que contengan substring cmd en la lista de favoritos y los despliega en pantalla junto con su número asociado)
@@ -508,4 +508,37 @@ void cargar_favs(){
 
     fclose(origenFile);
     fclose(destinoFile);
+}
+
+void eliminar_favs(int numero){
+    if(numero <= 0){
+        perror("Número invalido.");
+        return;
+    }
+
+    FILE *origenFile = fopen(archivo_favs, "r");
+    FILE *origen_temporal = fopen("temp.csv", "w");
+
+    if (origenFile == NULL || origen_temporal == NULL) {
+        perror("No se pudo abrir el archivo de origen");
+        liberar_comandos();
+        liberar_comandos_anteriores();
+        eliminar_cache();
+        exit(EXIT_FAILURE);
+    }
+
+    int contador = 1;
+    char buffer[BUFFER_SIZE];
+    while(fgets(buffer, sizeof(buffer), origenFile)){
+        if(contador++ != numero){
+            fputs(buffer, origen_temporal);
+        }
+    }
+
+    fclose(origen_temporal);
+    fclose(origenFile);
+
+    remove(archivo_favs);
+    rename("temp.csv", archivo_favs);
+
 }
