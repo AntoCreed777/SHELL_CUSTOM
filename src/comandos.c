@@ -299,6 +299,7 @@ int manejar_comandos_internos(char **comando){
                 printf(AMARILLO "Archivo creado exitosamente" RESET_COLOR "\n");
             }
         }
+
         else if(strcmp(comando[1], "mostrar") == 0){    //favs mostrar (despliega la lista comandos existentes en la lista con su respectivo número)
             mostrar_favs();
         }
@@ -583,8 +584,9 @@ void buscar_favs(char *busqueda){
     while(fgets(buffer, sizeof(buffer), origenFile) != NULL){
         if(strstr(buffer, busqueda) != NULL){
             buffer[strcspn(buffer, ";")] = 0;
-            printf(AZUL"%d: " ROJO "%s\n" RESET_COLOR, contador++, buffer);
+            printf(AZUL"%d: " ROJO "%s\n" RESET_COLOR, contador, buffer);
         }
+        contador++;
     }
 }
 
