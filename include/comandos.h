@@ -18,7 +18,7 @@ void guardar_favs();
 void borrar_favs();
 void mostrar_favs();
 void cargar_favs();
-void eliminar_favs(int numero);
+void eliminar_favs(int *numero, int numero_comandos_eliminar);
 void buscar_favs(char *busqueda);
 void ejecutar_favs(int numero);
 void guardar_ruta_favs();

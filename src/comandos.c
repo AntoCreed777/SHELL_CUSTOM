@@ -309,8 +309,18 @@ int manejar_comandos_internos(char **comando){
                 printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
                 return 1;
             }
-            int numero_elimminar = atoi(comando[2]);
-            eliminar_favs(numero_elimminar);
+            // Arreglo para guardar los elementos a borrar
+            int *numero_eliminar = (int*) malloc(sizeof(int));
+            int contador_num_eliminar = 2;
+
+            while(comando[contador_num_eliminar] != NULL){
+                if(contador_num_eliminar > 2){
+                    numero_eliminar = (int*) realloc(numero_eliminar, (contador_num_eliminar - 2) * sizeof(int));
+                }
+                numero_eliminar[contador_num_eliminar - 2] = atoi(comando[contador_num_eliminar]);
+                contador_num_eliminar++;
+            }
+            eliminar_favs(numero_eliminar, contador_num_eliminar - 2);
         }
 
         else if(strcmp(comando[1], "buscar") == 0){     //favs buscar cmd (Busca comandos que contengan substring cmd en la lista de favoritos y los despliega en pantalla junto con su número asociado)
@@ -541,10 +551,9 @@ void cargar_favs(){
     
 }
 
-void eliminar_favs(int numero){
-    if(numero <= 0){
-        perror("Número invalido.");
-        return;
+void eliminar_favs(int *numero, int numero_comandos_eliminar){
+    for(int i = 0; i < numero_comandos_eliminar; i++){
+        if(numero[i] <= 0) perror("Numero invalido.");
     }
 
     FILE *origenFile = fopen(archivo_favs, "r");
@@ -559,10 +568,16 @@ void eliminar_favs(int numero){
 
     int contador = 1;
     char buffer[BUFFER_SIZE];
+    bool estado_eliminar = true;
+    
+    // Valido que el contador no sea igual a ninguno de los numeros.
     while(fgets(buffer, sizeof(buffer), origenFile)){
-        if(contador++ != numero){
-            fputs(buffer, origen_temporal);
-        }
+        estado_eliminar = true;
+        for(int i = 0; i < numero_comandos_eliminar; i++)
+            if(contador == numero[i]) estado_eliminar = false;
+            
+        if(estado_eliminar) fputs(buffer, origen_temporal);
+        contador++;
     }
 
     fclose(origen_temporal);
