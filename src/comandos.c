@@ -450,7 +450,69 @@ void mostrar_favs(){
 }
 
 void cargar_favs(){
-    printf("COMANDO EN CONSTRUCCION\n");
+    FILE *file = fopen(archivo_favs,"r");
+    if (file == NULL) {
+        perror("Error al abrir el archivo");
+        return;
+    }
+
+    int canticad_cache = 0;
+    if(cache_comandos != NULL)
+        for(int i=0;cache_comandos[i] != NULL;i++)
+            canticad_cache++;
+
+    indice_inicio_anterior_linea_comando = canticad_cache;
+
+    char buffer[BUFFER_SIZE];
+    while (fgets(buffer, sizeof(buffer), file) != NULL) {
+        char *contexto_comando;
+
+        char *token_comando = strtok_r(buffer,";\n",&contexto_comando); // Separo por ';' eliminando el '\n'
+
+        while(token_comando != NULL){
+            cache_comandos = (char***)realloc(cache_comandos,sizeof(char**) * (canticad_cache+1));
+
+            if(cache_comandos == NULL){
+                perror(ROJO "Error en la reasignación de memoria");
+                exit(EXIT_FAILURE);
+            }
+
+            cache_comandos[canticad_cache] = NULL;
+
+            int elemento = 0;
+            char *contexto_elemento;
+            char *token_elementos = strtok_r(token_comando," ",&contexto_elemento); // Separo por ' ' (espacio)
+
+            while(token_elementos != NULL){
+
+                cache_comandos[canticad_cache] = (char**)realloc(cache_comandos[canticad_cache],sizeof(char*) * (elemento+1));
+
+                if(cache_comandos[canticad_cache] == NULL){
+                    perror(ROJO "Error en la reasignación de memoria");
+                    exit(EXIT_FAILURE);
+                }
+
+                cache_comandos[canticad_cache][elemento] = strdup(token_elementos);
+
+                elemento++;
+                token_elementos = strtok_r(NULL," ",&contexto_elemento);
+            }
+
+            // Añadimos un NULL al final del array para marcar el fin del comando
+            cache_comandos[canticad_cache] = (char **)realloc(cache_comandos[canticad_cache], sizeof(char*) * (elemento+1));
+            cache_comandos[canticad_cache][elemento] = NULL;
+
+            token_comando = strtok_r(NULL,";\n",&contexto_comando);
+
+            canticad_cache++;
+
+        }
+
+        // Añadimos un NULL al final del array para marcar el fin de los comandos
+        cache_comandos = (char ***)realloc(cache_comandos, sizeof(char**) * (canticad_cache + 1));
+        cache_comandos[canticad_cache] = NULL;
+    }
+    
 }
 
 void eliminar_favs(int numero){
