@@ -320,6 +320,8 @@ int manejar_comandos_internos(char **comando){
                 printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
                 return 1;
             }
+            int numero = atoi(comando[2]);
+            ejecutar_favs(numero);
 
 
         }
@@ -565,4 +567,60 @@ void buscar_favs(char *busqueda){
             printf(AZUL"%d: " ROJO "%s\n" RESET_COLOR, contador++, buffer);
         }
     }
+}
+
+void ejecutar_favs(int numero){
+    // En caso de que atoi arroje un numero menor a 0
+    if(numero <= 0){
+        perror("Número invalido.");
+        return;
+    }
+
+    FILE *origenFile = fopen(archivo_favs, "r");
+
+    if (origenFile == NULL) {
+        perror("No se pudo abrir el archivo de origen");
+        liberar_comandos();
+        liberar_cache();
+        exit(EXIT_FAILURE);
+    }
+
+    char buffer[BUFFER_SIZE];
+    int contador = 1;
+    // Buscamos la posicion de el comando
+    while(fgets(buffer, sizeof(buffer), origenFile) != NULL){
+        if(contador++ == numero){
+            // Quitamos valores sobrantes e innecesarios
+            buffer[strcspn(buffer, ";")] = 0;
+            buffer[strcspn(buffer, "\n")] = '\0';
+
+            char **comando_ejecutar = NULL;
+            int tamaño = 0;
+
+            char *token = strtok(buffer, " ");
+            // Creamos el array de comandos para poder pasarlo a manejo de comandos
+            while (token != NULL) {
+                comando_ejecutar = (char **)realloc(comando_ejecutar, sizeof(char *) * ++tamaño);
+                if (comando_ejecutar == NULL) {
+                    perror(ROJO "Error en la reasignación de memoria");
+                    exit(EXIT_FAILURE);
+                }
+                comando_ejecutar[tamaño - 1] = strdup(token);
+                token = strtok(NULL, " ");
+            }
+            // Ultimo comando lo dejamos en NULl
+            comando_ejecutar = (char **)realloc(comando_ejecutar, sizeof(char *) * (tamaño + 1));
+            comando_ejecutar[tamaño] = NULL;
+
+            if(manejar_comandos_internos(comando_ejecutar)) continue;
+            manejar_comandos_externos(comando_ejecutar);
+
+            // Liberar memoria xd
+            for (int i = 0; i < tamaño; i++) {
+                free(comando_ejecutar[i]);
+            }
+            free(comando_ejecutar);
+        }
+    }
+    fclose(origenFile);
 }
