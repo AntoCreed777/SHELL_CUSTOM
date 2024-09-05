@@ -431,7 +431,7 @@ void guardar_favs(){
 }
 
 void borrar_favs(){
-    printf(AMARILLO "Borrando Archivo: %s\n" RESET_COLOR, archivo_favs);
+    printf(AMARILLO "Borrando Archivo: " AZUL "%s\n" RESET_COLOR, archivo_favs);
 
     if(access(archivo_favs, F_OK) != 0) return; //Si no existe el archivo
 
@@ -440,6 +440,10 @@ void borrar_favs(){
         exit(EXIT_FAILURE);
     }
     else{
+        archivo_favs = "favs.csv";
+        printf(AMARILLO "Archivo de favoritos eliminado exitosamente\n" RESET_COLOR);
+        printf(AMARILLO "Se creará/usara un archivo de favoritos por defecto.\n" RESET_COLOR);
+
         if(access(direccion_favs, F_OK) != 0) return; //Si no existe el archivo
 
         if (remove(direccion_favs) != 0){
