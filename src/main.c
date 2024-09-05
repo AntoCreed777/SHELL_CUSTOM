@@ -4,7 +4,7 @@
 #include <string.h>
 #include <signal.h>
 #include <sys/wait.h>
-#include "colores.h"
+#include "constantes.h"
 #include "interfaz.h"
 #include "signal_handlers.h"
 #include "comandos.h"

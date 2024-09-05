@@ -1,5 +1,5 @@
 #pragma once
-#include "colores.h"
+#include "constantes.h"
 
 //A continuacion se detallan las diferentes funciones para manejar las distintas señales
 void sigterm_handler(int sig);

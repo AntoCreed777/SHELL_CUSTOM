@@ -5,7 +5,7 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include "interfaz.h"
-#include "colores.h"
+#include "constantes.h"
 #define BUFFER_SIZE 1024
 
 

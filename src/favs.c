@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "favs.h"
-#include "colores.h"
+#include "constantes.h"
 #include "comandos.h"
 
 char *archivo_favs = "favs.csv";  //Archivo donde se guarda la lista de favoritos

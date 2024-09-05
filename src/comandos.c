@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include "comandos.h"
 #include "interfaz.h"
-#include "colores.h"
+#include "constantes.h"
 #include "utils.h"
 #include "favs.h"
 
