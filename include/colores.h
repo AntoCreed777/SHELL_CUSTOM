@@ -8,3 +8,5 @@
 #define CIAN        "\033[1;36m"
 #define BLANCO      "\033[1;37m"
 #define RESET_COLOR "\033[0m"
+
+#define BUFFER_SIZE 1024

@@ -11,7 +11,6 @@
 
 
 char ***comandos = NULL;
-char ***cache_comandos = NULL; //Cache
 
 char *directorio_actual(){
     FILE *fp = popen("pwd","r");

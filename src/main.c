@@ -8,6 +8,7 @@
 #include "interfaz.h"
 #include "signal_handlers.h"
 #include "comandos.h"
+#include "favs.h"
 
 
 int main(){
