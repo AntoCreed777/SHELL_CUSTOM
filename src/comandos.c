@@ -287,8 +287,6 @@ int manejar_comandos_internos(char **comando){
                 printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
                 return 1;
             }
-
-
         }
 
 
@@ -310,6 +308,7 @@ int manejar_comandos_internos(char **comando){
                 printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
                 return 1;
             }
+            buscar_favs(comando[2]);
             
 
         }
@@ -323,6 +322,8 @@ int manejar_comandos_internos(char **comando){
                 printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
                 return 1;
             }
+            int numero = atoi(comando[2]);
+            ejecutar_favs(numero);
             
 
         }
@@ -540,5 +541,26 @@ void eliminar_favs(int numero){
 
     remove(archivo_favs);
     rename("temp.csv", archivo_favs);
+}
 
+void buscar_favs(char *busqueda){
+    FILE *origenFile = fopen(archivo_favs, "r");
+
+    if (origenFile == NULL) {
+        perror("No se pudo abrir el archivo de origen");
+        liberar_comandos();
+        liberar_comandos_anteriores();
+        eliminar_cache();
+        exit(EXIT_FAILURE);
+    }
+
+
+    char buffer[BUFFER_SIZE];
+    int contador = 1;
+    while(fgets(buffer, sizeof(buffer), origenFile) != NULL){
+        if(strstr(buffer, busqueda) != NULL){
+            buffer[strcspn(buffer, ";")] = 0;
+            printf(AZUL"%d: " ROJO "%s\n" RESET_COLOR, contador++, buffer);
+        }
+    }
 }

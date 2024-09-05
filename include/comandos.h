@@ -21,3 +21,4 @@ void borrar_favs();
 void mostrar_favs();
 void cargar_favs();
 void eliminar_favs(int numero);
+void buscar_favs(char *busqueda);
