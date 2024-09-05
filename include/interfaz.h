@@ -1,7 +1,7 @@
 #pragma once
 
 extern char ***comandos;
-extern char ***comandos_anteriores;
+extern char ***cache_comandos;
 
 
 char *directorio_actual();

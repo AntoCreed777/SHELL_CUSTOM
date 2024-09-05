@@ -13,9 +13,8 @@
 #define BUFFER_SIZE 1024
 
 pid_t c_pid = -1;
-const char *archivo_cache = "cache.csv";
 const char *archivo_favs = "favs.csv";
-
+int indice_inicio_anterior_linea_comando = 0;
 
 char ***entrada_comandos(){
     mostrar_prompt();
@@ -94,13 +93,13 @@ void liberar_comandos(){
     free(comandos);
 }
 
-void liberar_comandos_anteriores(){
-    if(comandos_anteriores == NULL) return;
-    for(int i=0;comandos_anteriores[i] != NULL;i++) {
-        for(int j=0;comandos_anteriores[i][j] != NULL;j++) free(comandos_anteriores[i][j]);
-        free(comandos_anteriores[i]);
+void liberar_cache(){
+    if(cache_comandos == NULL) return;
+    for(int i=0;cache_comandos[i] != NULL;i++) {
+        for(int j=0;cache_comandos[i][j] != NULL;j++) free(cache_comandos[i][j]);
+        free(cache_comandos[i]);
     }
-    free(comandos_anteriores);
+    free(cache_comandos);
 }
 
 void manejar_comandos_externos(char **comando){
@@ -205,18 +204,19 @@ int manejar_comandos_internos(char **comando){
     }
 
     if(strcmp(comando[0], "!!") == 0){
-        if(comandos_anteriores == NULL) return 1;
+        if(cache_comandos == NULL) return 1;
 
         //Impresion de los comandos anteriores
-        for(int i=0;comandos_anteriores[i] != NULL;i++) {
-            printf("Command %d: ",i+1);
-            for(int j=0;comandos_anteriores[i][j] != NULL;j++) printf("%s ",comandos_anteriores[i][j]);
+        for(int i=indice_inicio_anterior_linea_comando,k=0;cache_comandos[i] != NULL;i++,k++) {
+            printf(AZUL "Command %d: " RESET_COLOR,k+1);
+            for(int j=0;cache_comandos[i][j] != NULL;j++) printf(ROJO "%s " RESET_COLOR,cache_comandos[i][j]);
             printf("\n");
         }
 
         //Ejecucion de los comandos anteriores
 
-        for(int i=0;comandos_anteriores[i] != NULL;i++) manejar_comandos_externos(comandos_anteriores[i]);
+        for(int i=indice_inicio_anterior_linea_comando;cache_comandos[i] != NULL;i++)
+            manejar_comandos_externos(cache_comandos[i]);
 
         return 1;
     }
@@ -309,8 +309,6 @@ int manejar_comandos_internos(char **comando){
                 return 1;
             }
             buscar_favs(comando[2]);
-            
-
         }
 
         else if(strcmp(comando[1], "borrar") == 0){     //favs borrar (Borra todos los comandos en la lista de favoritos)
@@ -322,9 +320,7 @@ int manejar_comandos_internos(char **comando){
                 printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
                 return 1;
             }
-            int numero = atoi(comando[2]);
-            ejecutar_favs(numero);
-            
+
 
         }
 
@@ -344,109 +340,82 @@ int manejar_comandos_internos(char **comando){
 }
 
 void guardar_comandos(){
-    if(strcmp(comandos[0][0],"!!") == 0 || strcmp(comandos[0][0],"favs") == 0) return;
-    
-    if(comandos_anteriores != NULL) liberar_comandos_anteriores();
-    comandos_anteriores = NULL;
+    int num_comandos = 0, num_invalidos = 0, num_cache = 0;
 
-    int num_comandos = 0, num_invalidos = 0;
+    if (cache_comandos != NULL)
+        for(int i=0;cache_comandos[i] != NULL;i++) 
+            num_cache++;
 
-    while(comandos[num_comandos + num_invalidos] != NULL) {   // Comandos
+    int old = indice_inicio_anterior_linea_comando;
+    indice_inicio_anterior_linea_comando = num_cache;
+
+    // Procesar los nuevos comandos para guardarlos
+    while(comandos[num_comandos + num_invalidos] != NULL) {
         if(strcmp(comandos[num_comandos + num_invalidos][0],"!!") == 0 || strcmp(comandos[num_comandos + num_invalidos][0],"favs") == 0) {
+            if(num_comandos == 0)
+                indice_inicio_anterior_linea_comando = old;
+            else
+                indice_inicio_anterior_linea_comando--;
+            
             num_invalidos++;
             continue;
         }
 
-        comandos_anteriores = (char***)realloc(comandos_anteriores,sizeof(char**) * (num_comandos+1));
-        
-        if(comandos_anteriores == NULL){
+        int posicion = num_cache + num_comandos;
+
+        // Reasignar memoria para el nuevo comando
+        cache_comandos = (char***)realloc(cache_comandos,sizeof(char**) * (posicion + 1));
+        if(cache_comandos == NULL){
             perror(ROJO "Error en la reasignación de memoria");
             liberar_comandos();
             exit(EXIT_FAILURE);
         }
 
-        comandos_anteriores[num_comandos]= NULL;
+        cache_comandos[posicion] = NULL;
 
         int num_elementos = 0;
-
+        
+        // Copiar los elementos del comando
         while(comandos[num_comandos + num_invalidos][num_elementos] != NULL){    // Elementos del Comando
-            comandos_anteriores[num_comandos] = (char**)realloc(comandos_anteriores[num_comandos],sizeof(char*) * (num_elementos+1));
+            cache_comandos[posicion] = (char**)realloc(cache_comandos[posicion],sizeof(char*) * (num_elementos+1));
             
-            if(comandos_anteriores[num_comandos] == NULL){
+            if(cache_comandos[posicion] == NULL){
                 perror(ROJO "Error en la reasignación de memoria");
                 exit(EXIT_FAILURE);
             }
 
-            comandos_anteriores[num_comandos][num_elementos] = strdup(comandos[num_comandos + num_invalidos][num_elementos]);
+            cache_comandos[posicion][num_elementos] = strdup(comandos[num_comandos + num_invalidos][num_elementos]);
             num_elementos++;
         }
-        comandos_anteriores[num_comandos] = (char**)realloc(comandos_anteriores[num_comandos],sizeof(char*) * (num_elementos+1));
-        comandos_anteriores[num_comandos][num_elementos] = NULL;
+        // Terminar el array de elementos del comando con NULL
+        cache_comandos[posicion] = (char**)realloc(cache_comandos[posicion],sizeof(char*) * (num_elementos+1));
+        cache_comandos[posicion][num_elementos] = NULL;
         num_comandos++;
     }
-    comandos_anteriores = (char***)realloc(comandos_anteriores,sizeof(char**) * (num_comandos+1));
-    comandos_anteriores[num_comandos] = NULL;
+
+    // Terminar el array de comandos anteriores con NULL
+    cache_comandos = (char***)realloc(cache_comandos,sizeof(char**) * (num_comandos + num_cache +1));
+    cache_comandos[num_comandos + num_cache] = NULL;
 }
 
-void guardar_cache(){
-    FILE *file = fopen(archivo_cache,"a+");
+void guardar_favs(){
+    FILE *file = fopen(archivo_favs,"a+");
     if (file == NULL) {
         perror("Error al abrir el archivo");
         liberar_comandos();
-        liberar_comandos_anteriores();
+        liberar_cache();
         exit(EXIT_FAILURE);
     }
 
     
-    for(int i=0;comandos[i] != NULL;i++){
-        for(int j=0;comandos[i][j] != NULL;j++){
-            fprintf(file,"%s ",comandos[i][j]);
+    for(int i=0;cache_comandos[i] != NULL;i++){
+        for(int j=0;cache_comandos[i][j] != NULL;j++){
+            fprintf(file,"%s ",cache_comandos[i][j]);
         }
         fprintf(file,";\n");
-
     }
 
     fclose(file);
-}
-
-void eliminar_cache(){
-    if(access(archivo_cache, F_OK) != 0) return; //Si no existe el archivo
-
-    if (remove(archivo_cache) != 0){
-        perror("Error al eliminar el archivo");
-        exit(EXIT_FAILURE);
-    }
-}
-
-void guardar_favs(){
-    FILE *origenFile = fopen(archivo_cache, "rb");
-    if (origenFile == NULL) {
-        perror("No se pudo abrir el archivo de origen");
-        liberar_comandos();
-        liberar_comandos_anteriores();
-        eliminar_cache();
-        exit(EXIT_FAILURE);
-    }
-
-    FILE *destinoFile = fopen(archivo_favs, "ab");
-    if (destinoFile == NULL) {
-        perror("No se pudo abrir el archivo de destino");
-        fclose(origenFile);
-        liberar_comandos();
-        liberar_comandos_anteriores();
-        eliminar_cache();
-        exit(EXIT_FAILURE);
-    }
-
-    char buffer[BUFFER_SIZE];
-    size_t bytesRead;
-
-    // Leer del archivo de origen y escribir en el archivo de destino
-    while ((bytesRead = fread(buffer, 1, sizeof(buffer), origenFile)) > 0)
-        fwrite(buffer, 1, bytesRead, destinoFile);
-
-    fclose(origenFile);
-    fclose(destinoFile);
 }
 
 void borrar_favs(){
@@ -466,7 +435,7 @@ void mostrar_favs(){
     if (file == NULL) {
         perror("Error al abrir el archivo");
         liberar_comandos();
-        liberar_comandos_anteriores();
+        liberar_cache();
         exit(EXIT_FAILURE);
     }
 
@@ -481,34 +450,7 @@ void mostrar_favs(){
 }
 
 void cargar_favs(){
-    FILE *origenFile = fopen(archivo_favs, "rb");
-    if (origenFile == NULL) {
-        perror("No se pudo abrir el archivo de origen");
-        liberar_comandos();
-        liberar_comandos_anteriores();
-        eliminar_cache();
-        exit(EXIT_FAILURE);
-    }
-
-    FILE *destinoFile = fopen(archivo_cache, "ab");
-    if (destinoFile == NULL) {
-        perror("No se pudo abrir el archivo de destino");
-        fclose(origenFile);
-        liberar_comandos();
-        liberar_comandos_anteriores();
-        eliminar_cache();
-        exit(EXIT_FAILURE);
-    }
-
-    char buffer[BUFFER_SIZE];
-    size_t bytesRead;
-
-    // Leer del archivo de origen y escribir en el archivo de destino
-    while ((bytesRead = fread(buffer, 1, sizeof(buffer), origenFile)) > 0)
-        fwrite(buffer, 1, bytesRead, destinoFile);
-
-    fclose(origenFile);
-    fclose(destinoFile);
+    printf("COMANDO EN CONSTRUCCION\n");
 }
 
 void eliminar_favs(int numero){
@@ -523,8 +465,7 @@ void eliminar_favs(int numero){
     if (origenFile == NULL || origen_temporal == NULL) {
         perror("No se pudo abrir el archivo de origen");
         liberar_comandos();
-        liberar_comandos_anteriores();
-        eliminar_cache();
+        liberar_cache();
         exit(EXIT_FAILURE);
     }
 
@@ -549,8 +490,7 @@ void buscar_favs(char *busqueda){
     if (origenFile == NULL) {
         perror("No se pudo abrir el archivo de origen");
         liberar_comandos();
-        liberar_comandos_anteriores();
-        eliminar_cache();
+        liberar_cache();
         exit(EXIT_FAILURE);
     }
 

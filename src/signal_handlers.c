@@ -14,8 +14,7 @@ extern pid_t c_pid;
 void sigterm_handler(int sig) {
     printf(BLANCO "\nSaliendo de la SHELL\n" RESET_COLOR);
     liberar_comandos();
-    liberar_comandos_anteriores();
-    eliminar_cache();
+    liberar_cache();
     exit(0);
 }
 
@@ -27,7 +26,7 @@ void sigint_handler(int sig) {
     if (kill(c_pid, SIGKILL) < 0) {  // Matar todos los procesos en el grupo de procesos actual
         perror("Ocurrió un error al matar a los procesos hijos");
         liberar_comandos();
-        liberar_comandos_anteriores();
+        liberar_cache();
         exit(EXIT_FAILURE);
     }
 }
