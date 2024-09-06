@@ -186,6 +186,8 @@ static int favs_command(char **comando){
         guardar_favs();
     }
 
+    else printf(ROJO "Argumentos ingresados erroneos" RESET_COLOR "\n");
+
     return 1;
 }
 
