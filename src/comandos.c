@@ -34,6 +34,8 @@ char ***entrada_comandos(){
     if(is_empty_linea(cadena)) 
         return NULL; //Si no se ingresa ningun comando, (solamente ingresa '\n')
 
+    eliminar_tabs(cadena); // Eliminar los tabs de la cadena
+
     //Extraccion de las distintas partes del comando
     char ***comandos = NULL;
     int comando = 0;

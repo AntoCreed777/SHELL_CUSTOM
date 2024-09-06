@@ -14,3 +14,11 @@ bool is_empty_linea(char* linea){
     }
     return true;
 }
+
+char *eliminar_tabs(char *linea){
+    for(int contador = 0; linea[contador] != '\0';contador++)
+        if(linea[contador] == '\t')
+            linea[contador] = ' ';
+    
+    return linea;
+}
