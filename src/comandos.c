@@ -158,7 +158,7 @@ void guardar_comandos_cache(){
 
 
 void guardar_comandos_anteriores(){
-    //if(strcmp(comandos[0][0],"!!") == 0 || strcmp(comandos[0][0],"favs") == 0) return;
+    if(strcmp(comandos[0][0],"!!") == 0 || strcmp(comandos[0][0],"favs") == 0) return;
     
     if(comandos_anteriores != NULL) liberar_comandos_anteriores();
     comandos_anteriores = NULL;
