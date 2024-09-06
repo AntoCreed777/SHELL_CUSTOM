@@ -143,9 +143,9 @@ bool cargar_favs(){
     
 }
 
-void eliminar_favs(int *numero, int numero_comandos_eliminar){
-    for(int i = 0; i < numero_comandos_eliminar; i++){
-        if(numero[i] <= 0) perror("Numero invalido.");
+void eliminar_favs(int *numero_comando_eliminar, int cantidad_comandos_eliminar){
+    for(int i = 0; i < cantidad_comandos_eliminar; i++){
+        if(numero_comando_eliminar[i] <= 0) perror(ROJO "Numero invalido." RESET_COLOR);
     }
 
     FILE *origenFile = fopen(archivo_favs, "r");
@@ -160,17 +160,24 @@ void eliminar_favs(int *numero, int numero_comandos_eliminar){
 
     int contador = 1;
     char buffer[BUFFER_SIZE];
-    bool estado_eliminar = true;
+    bool estado_eliminar = false;
     
     // Valido que el contador no sea igual a ninguno de los numeros.
     while(fgets(buffer, sizeof(buffer), origenFile)){
-        estado_eliminar = true;
-        for(int i = 0; i < numero_comandos_eliminar; i++)
-            if(contador == numero[i]) estado_eliminar = false;
+        estado_eliminar = false;
+        for(int i = 0; i < cantidad_comandos_eliminar; i++)
+            if(contador == numero_comando_eliminar[i]) {
+                estado_eliminar = true;
+                numero_comando_eliminar[i] = -1;
+            }
             
-        if(estado_eliminar) fputs(buffer, origen_temporal);
+        if(!estado_eliminar) fputs(buffer, origen_temporal);
         contador++;
     }
+
+    for(int i = 0; i < cantidad_comandos_eliminar; i++)
+        if(numero_comando_eliminar[i] > 0)
+            printf(AMARILLO "Numero invalido: %d\n" RESET_COLOR, numero_comando_eliminar[i]);
 
     fclose(origen_temporal);
     fclose(origenFile);
