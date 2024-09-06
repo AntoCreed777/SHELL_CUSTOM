@@ -53,7 +53,6 @@ void borrar_favs(){
 }
 
 void mostrar_favs(){
-    printf("Comandos Favoritos:\n");
     if(access(archivo_favs, F_OK) != 0) return; //Si no existe el archivo
 
     FILE *file = fopen(archivo_favs,"r");
@@ -67,18 +66,20 @@ void mostrar_favs(){
     int contador = 1;
     char buffer[BUFFER_SIZE];
     while (fgets(buffer, sizeof(buffer), file) != NULL) {
+        if(contador == 1) printf("Comandos Favoritos:\n");
         buffer[strcspn(buffer, ";")] = 0;  // Eliminar el salto de línea
         printf(AZUL"%d: " ROJO "%s\n" RESET_COLOR, contador++, buffer);
     }
+    if(contador == 1) printf(AMARILLO "No hay comandos favoritos\n" RESET_COLOR);
 
     fclose(file);
 }
 
-void cargar_favs(){
+bool cargar_favs(){
     FILE *file = fopen(archivo_favs,"r");
     if (file == NULL) {
-        perror("Error al abrir el archivo");
-        return;
+        perror(ROJO "Error al abrir el archivo" RESET_COLOR);
+        return false;
     }
 
     int canticad_cache = 0;
@@ -137,6 +138,8 @@ void cargar_favs(){
         cache_comandos = (char ***)realloc(cache_comandos, sizeof(char**) * (canticad_cache + 1));
         cache_comandos[canticad_cache] = NULL;
     }
+
+    return true;
     
 }
 

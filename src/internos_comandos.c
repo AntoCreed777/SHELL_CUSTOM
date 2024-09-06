@@ -177,7 +177,7 @@ static int favs_command(char **comando){
 
     else if (strcmp(comando[1], "cargar") == 0)
     { // favs cargar (Lee comandos de archivo de favoritos, los mantiene en memoria y los despliega en pantalla)
-        cargar_favs();
+        if(!cargar_favs()) return 1;
         mostrar_favs();
     }
 
