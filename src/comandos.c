@@ -94,7 +94,7 @@ char ***entrada_comandos(){
 
 
 
-void guardar_comandos(){
+void guardar_comandos_cache(){
     int num_comandos = 0, num_invalidos = 0, num_cache = 0;
 
     if (cache_comandos != NULL)
@@ -156,3 +156,48 @@ void guardar_comandos(){
     cache_comandos[num_comandos + num_cache] = NULL;
 }
 
+
+void guardar_comandos_anteriores(){
+    //if(strcmp(comandos[0][0],"!!") == 0 || strcmp(comandos[0][0],"favs") == 0) return;
+    
+    if(comandos_anteriores != NULL) liberar_comandos_anteriores();
+    comandos_anteriores = NULL;
+
+    int num_comandos = 0, num_invalidos = 0;
+
+    while(comandos[num_comandos + num_invalidos] != NULL) {   // Comandos
+        if(strcmp(comandos[num_comandos + num_invalidos][0],"!!") == 0 || strcmp(comandos[num_comandos + num_invalidos][0],"favs") == 0) {
+            num_invalidos++;
+            continue;
+        }
+
+        comandos_anteriores = (char***)realloc(comandos_anteriores,sizeof(char**) * (num_comandos+1));
+        
+        if(comandos_anteriores == NULL){
+            perror(ROJO "Error en la reasignación de memoria");
+            liberar_comandos();
+            exit(EXIT_FAILURE);
+        }
+
+        comandos_anteriores[num_comandos]= NULL;
+
+        int num_elementos = 0;
+
+        while(comandos[num_comandos + num_invalidos][num_elementos] != NULL){    // Elementos del Comando
+            comandos_anteriores[num_comandos] = (char**)realloc(comandos_anteriores[num_comandos],sizeof(char*) * (num_elementos+1));
+            
+            if(comandos_anteriores[num_comandos] == NULL){
+                perror(ROJO "Error en la reasignación de memoria");
+                exit(EXIT_FAILURE);
+            }
+
+            comandos_anteriores[num_comandos][num_elementos] = strdup(comandos[num_comandos + num_invalidos][num_elementos]);
+            num_elementos++;
+        }
+        comandos_anteriores[num_comandos] = (char**)realloc(comandos_anteriores[num_comandos],sizeof(char*) * (num_elementos+1));
+        comandos_anteriores[num_comandos][num_elementos] = NULL;
+        num_comandos++;
+    }
+    comandos_anteriores = (char***)realloc(comandos_anteriores,sizeof(char**) * (num_comandos+1));
+    comandos_anteriores[num_comandos] = NULL;
+}

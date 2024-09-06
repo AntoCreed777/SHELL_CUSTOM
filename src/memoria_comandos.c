@@ -6,6 +6,7 @@
 
 char ***comandos = NULL;
 char ***cache_comandos = NULL;
+char ***comandos_anteriores = NULL;
 pid_t c_pid = -1;
 int indice_inicio_anterior_linea_comando = 0;
 
@@ -33,3 +34,11 @@ void liberar_cache(){
     free(cache_comandos);
 }
 
+void liberar_comandos_anteriores(){
+    if(comandos_anteriores == NULL) return;
+    for(int i=0;comandos_anteriores[i] != NULL;i++) {
+        for(int j=0;comandos_anteriores[i][j] != NULL;j++) free(comandos_anteriores[i][j]);
+        free(comandos_anteriores[i]);
+    }
+    free(comandos_anteriores);
+}

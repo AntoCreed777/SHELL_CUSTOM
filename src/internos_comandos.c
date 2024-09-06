@@ -66,20 +66,20 @@ static int change_directory_command(char **comando) {
 }
 
 static int usar_comando_anterior() {
-    if (cache_comandos == NULL) return 1;
+    if(comandos_anteriores == NULL) return 1;
 
-    // Impresion de los comandos anteriores
-    for (int i = indice_inicio_anterior_linea_comando, k = 0; cache_comandos[i] != NULL; i++, k++) {
-        printf(AZUL "Command %d: " RESET_COLOR, k + 1);
-        for (int j = 0; cache_comandos[i][j] != NULL; j++)
-            printf(ROJO "%s " RESET_COLOR, cache_comandos[i][j]);
+    //Impresion de los comandos anteriores
+    for(int i=0;comandos_anteriores[i] != NULL;i++) {
+        printf(AZUL "Command %d: " RESET_COLOR, i + 1);
+        for(int j=0;comandos_anteriores[i][j] != NULL;j++)
+            printf(ROJO "%s " RESET_COLOR, comandos_anteriores[i][j]);
         printf("\n");
     }
 
-    // Ejecucion de los comandos anteriores
+    //Ejecucion de los comandos anteriores
 
-    for (int i = indice_inicio_anterior_linea_comando; cache_comandos[i] != NULL; i++)
-        manejar_comandos_externos(cache_comandos[i]);
+    for(int i=0;comandos_anteriores[i] != NULL;i++)
+        manejar_comandos_externos(comandos_anteriores[i]);
 
     return 1;
 }

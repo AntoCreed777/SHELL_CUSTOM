@@ -28,7 +28,8 @@ int main(){
             manejar_comandos_externos(comandos[i]);
         }
 
-        guardar_comandos();
+        guardar_comandos_anteriores();
+        guardar_comandos_cache();
         liberar_comandos();
     }
 
