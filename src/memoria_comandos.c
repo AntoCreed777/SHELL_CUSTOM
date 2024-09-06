@@ -16,6 +16,7 @@ const char *direccion_favs = "direccion_favs.txt";  //Archivo donde se guarda la
 
 
 void liberar_comandos(){
+    if(comandos == NULL) return;
     for (int i = 0; comandos[i] != NULL; i++) {
         for (int j = 0; comandos[i][j] != NULL; j++) free(comandos[i][j]);
         free(comandos[i]);
