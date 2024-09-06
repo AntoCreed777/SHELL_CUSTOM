@@ -12,10 +12,8 @@
 void guardar_favs(){
     FILE *file = fopen(archivo_favs,"a+");
     if (file == NULL) {
-        perror("Error al abrir el archivo");
-        liberar_comandos();
-        liberar_cache();
-        exit(EXIT_FAILURE);
+        perror(ROJO "Error al abrir el archivo" RESET_COLOR);
+        return;
     }
 
     
@@ -35,8 +33,8 @@ void borrar_favs(){
     if(access(archivo_favs, F_OK) != 0) return; //Si no existe el archivo
 
     if (remove(archivo_favs) != 0){
-        perror("Error al eliminar el archivo de favoritos");
-        exit(EXIT_FAILURE);
+        perror(ROJO "Error al eliminar el archivo de favoritos" RESET_COLOR);
+        return;
     }
     else{
         archivo_favs = "favs.csv";
@@ -46,8 +44,8 @@ void borrar_favs(){
         if(access(direccion_favs, F_OK) != 0) return; //Si no existe el archivo
 
         if (remove(direccion_favs) != 0){
-            perror("Error al eliminar el archivo de dirección de favoritos");
-            exit(EXIT_FAILURE);
+            perror(ROJO "Error al eliminar el archivo de dirección de favoritos" RESET_COLOR);
+            return;
         }
     }
 }
@@ -57,10 +55,8 @@ void mostrar_favs(){
 
     FILE *file = fopen(archivo_favs,"r");
     if (file == NULL) {
-        perror("Error al abrir el archivo");
-        liberar_comandos();
-        liberar_cache();
-        exit(EXIT_FAILURE);
+        perror(ROJO "Error al abrir el archivo" RESET_COLOR);
+        return;
     }
 
     int contador = 1;
@@ -99,7 +95,8 @@ bool cargar_favs(){
             cache_comandos = (char***)realloc(cache_comandos,sizeof(char**) * (canticad_cache+1));
 
             if(cache_comandos == NULL){
-                perror(ROJO "Error en la reasignación de memoria");
+                perror(ROJO "Error en la reasignación de memoria" RESET_COLOR);
+                liberar_comandos();
                 exit(EXIT_FAILURE);
             }
 
@@ -114,7 +111,9 @@ bool cargar_favs(){
                 cache_comandos[canticad_cache] = (char**)realloc(cache_comandos[canticad_cache],sizeof(char*) * (elemento+1));
 
                 if(cache_comandos[canticad_cache] == NULL){
-                    perror(ROJO "Error en la reasignación de memoria");
+                    perror(ROJO "Error en la reasignación de memoria" RESET_COLOR);
+                    liberar_comandos();
+                    liberar_cache();
                     exit(EXIT_FAILURE);
                 }
 
@@ -152,10 +151,8 @@ void eliminar_favs(int *numero_comando_eliminar, int cantidad_comandos_eliminar)
     FILE *origen_temporal = fopen("temp.csv", "w");
 
     if (origenFile == NULL || origen_temporal == NULL) {
-        perror("No se pudo abrir el archivo de origen");
-        liberar_comandos();
-        liberar_cache();
-        exit(EXIT_FAILURE);
+        perror(ROJO "No se pudo abrir el archivo de origen" RESET_COLOR);
+        return;
     }
 
     int contador = 1;
@@ -190,10 +187,8 @@ void buscar_favs(char *busqueda){
     FILE *origenFile = fopen(archivo_favs, "r");
 
     if (origenFile == NULL) {
-        perror("No se pudo abrir el archivo de origen");
-        liberar_comandos();
-        liberar_cache();
-        exit(EXIT_FAILURE);
+        perror(ROJO "No se pudo abrir el archivo de origen" RESET_COLOR);
+        return;
     }
 
 
@@ -211,17 +206,15 @@ void buscar_favs(char *busqueda){
 void ejecutar_favs(int numero){
     // En caso de que atoi arroje un numero menor a 0
     if(numero <= 0){
-        perror("Número invalido.");
+        perror(ROJO "Número invalido." RESET_COLOR);
         return;
     }
 
     FILE *origenFile = fopen(archivo_favs, "r");
 
     if (origenFile == NULL) {
-        perror("No se pudo abrir el archivo de origen");
-        liberar_comandos();
-        liberar_cache();
-        exit(EXIT_FAILURE);
+        perror(ROJO "No se pudo abrir el archivo de origen" RESET_COLOR);
+        return;
     }
 
     char buffer[BUFFER_SIZE];
@@ -241,7 +234,9 @@ void ejecutar_favs(int numero){
             while (token != NULL) {
                 comando_ejecutar = (char **)realloc(comando_ejecutar, sizeof(char *) * ++tamaño);
                 if (comando_ejecutar == NULL) {
-                    perror(ROJO "Error en la reasignación de memoria");
+                    perror(ROJO "Error en la reasignación de memoria" RESET_COLOR);
+                    liberar_comandos();
+                    liberar_cache();
                     exit(EXIT_FAILURE);
                 }
                 comando_ejecutar[tamaño - 1] = strdup(token);
@@ -267,7 +262,7 @@ void ejecutar_favs(int numero){
 void guardar_ruta_favs(){
         FILE *file = fopen(direccion_favs, "w");
         if (file == NULL) {
-            perror("Error al abrir el archivo de dirección de favoritos");
+            perror(ROJO "Error al abrir el archivo de dirección de favoritos" RESET_COLOR);
             liberar_comandos();
             liberar_cache();
             exit(EXIT_FAILURE);
@@ -286,7 +281,7 @@ void cargar_ruta_favs(){
     else{
         archivo_favs = (char*)malloc(256 * sizeof(char));  // Reserva espacio para 256 caracteres
         if (archivo_favs == NULL) {
-            perror("Error al asignar memoria para archivo_favs");
+            perror(ROJO "Error al asignar memoria para archivo_favs" RESET_COLOR);
             liberar_comandos();
             liberar_cache();
             exit(EXIT_FAILURE);

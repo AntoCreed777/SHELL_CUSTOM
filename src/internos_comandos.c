@@ -13,7 +13,7 @@
 
 
 //Comandos internos utilizados por la shell
-static int timer_command(char **comando){
+static int timer_command(char **comando) {
     if (comando[1] == NULL || comando[2] == NULL)
         printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
 
@@ -30,8 +30,7 @@ static int timer_command(char **comando){
     {
         pid_t pid = fork();
 
-        if (pid == 0)
-        { // Proceso hijo
+        if (pid == 0) { // Proceso hijo
             sleep(atoi(comando[2]));
             printf("\n" AMARILLO "ALARMA" RESET_COLOR ": " MAGENTA);
             int contador = 3;
@@ -41,10 +40,9 @@ static int timer_command(char **comando){
             mostrar_prompt();
             exit(0);
         }
-        else if (pid < 0)
-        {
-            perror("Error al crear el proceso hijo");
-            exit(1);
+        else if (pid < 0) {
+            perror(ROJO "Error al crear el proceso hijo" RESET_COLOR);
+            return 1;
         }
 
         printf(AMARILLO "Alarma configurada para dentro de %d segundos." RESET_COLOR "\n" RESET_COLOR, atoi(comando[2]));
@@ -52,32 +50,26 @@ static int timer_command(char **comando){
 
     return 1;
 }
-static int change_directory_command(char **comando){
-    if (comando[1] == NULL)
-        printf(ROJO "FALTA UN ARGUMENTO" RESET_COLOR "\n");
-    else if (strcmp(comando[1], "~") == 0)
-    { // Implementacion del comando para dirigirse al Directorio Raiz
+
+static int change_directory_command(char **comando) {
+    if (comando[1] == NULL) printf(ROJO "FALTA UN ARGUMENTO" RESET_COLOR "\n");
+    else if (strcmp(comando[1], "~") == 0) { // Implementacion del comando para dirigirse al Directorio Raiz
         char *home_dir = getenv("HOME");
-        if (home_dir != NULL)
-        {
-            if (chdir(home_dir) != 0)
-                printf(ROJO "Error al ingresar al Directorio HOME" RESET_COLOR "\n");
+        if (home_dir != NULL) {
+            if (chdir(home_dir) != 0) printf(ROJO "Error al ingresar al Directorio HOME" RESET_COLOR "\n");
         }
-        else
-            printf(ROJO "Variable de entorno HOME no está definida" RESET_COLOR "\n");
+        else printf(ROJO "Variable de entorno HOME no está definida" RESET_COLOR "\n");
     }
-    else if (chdir(comando[1]) != 0)
-        perror(ROJO "Error al ingresar al Directorio" RESET_COLOR);
+    else if (chdir(comando[1]) != 0) perror(ROJO "Error al ingresar al Directorio" RESET_COLOR);
 
     return 1;
 }
+
 static int usar_comando_anterior() {
-    if (cache_comandos == NULL)
-        return 1;
+    if (cache_comandos == NULL) return 1;
 
     // Impresion de los comandos anteriores
-    for (int i = indice_inicio_anterior_linea_comando, k = 0; cache_comandos[i] != NULL; i++, k++)
-    {
+    for (int i = indice_inicio_anterior_linea_comando, k = 0; cache_comandos[i] != NULL; i++, k++) {
         printf(AZUL "Command %d: " RESET_COLOR, k + 1);
         for (int j = 0; cache_comandos[i][j] != NULL; j++)
             printf(ROJO "%s " RESET_COLOR, cache_comandos[i][j]);
@@ -91,9 +83,9 @@ static int usar_comando_anterior() {
 
     return 1;
 }
-static int favs_command(char **comando){
-    if (comando[1] == NULL)
-        printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
+
+static int favs_command(char **comando) {
+    if (comando[1] == NULL) printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
 
     else if (strcmp(comando[1], "help") == 0)
     {
@@ -110,10 +102,9 @@ static int favs_command(char **comando){
         }
 
         FILE *file = fopen(comando[2], "w");
-        if (file == NULL)
+        if (file == NULL) 
             printf(ROJO "Error al crear el archivo" RESET_COLOR "\n");
-        else
-        {
+        else {
             fclose(file);
             archivo_favs = strdup(comando[2]);
             guardar_ruta_favs();
@@ -140,9 +131,8 @@ static int favs_command(char **comando){
         while (comando[contador_num_eliminar] != NULL)
         {
             if (contador_num_eliminar > 2)
-            {
                 numero_eliminar = (int *)realloc(numero_eliminar, (contador_num_eliminar - 2) * sizeof(int));
-            }
+            
             numero_eliminar[contador_num_eliminar - 2] = atoi(comando[contador_num_eliminar]);
             contador_num_eliminar++;
         }
@@ -151,8 +141,7 @@ static int favs_command(char **comando){
 
     else if (strcmp(comando[1], "buscar") == 0)
     { // favs buscar cmd (Busca comandos que contengan substring cmd en la lista de favoritos y los despliega en pantalla junto con su número asociado)
-        if (comando[2] == NULL)
-        {
+        if (comando[2] == NULL) {
             printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
             return 1;
         }
@@ -166,8 +155,7 @@ static int favs_command(char **comando){
 
     else if (strcmp(comando[1], "ejecutar") == 0)
     { // favs num ejecutar (Ejecuta el comando, cuyo número en la lista es num) //INVERTI EL ORDEN DE LOS ARGUMENTOS
-        if (comando[2] == NULL)
-        {
+        if (comando[2] == NULL) {
             printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
             return 1;
         }
@@ -192,24 +180,24 @@ static int favs_command(char **comando){
 }
 
 // Manejar comandos internos propios de esta SHELL
-int manejar_comandos_internos(char **comando){
-    if(strcmp(comando[0], "exit") == 0){     //Si se escribe "exit" se termina ded ejecutar el programa
+int manejar_comandos_internos(char **comando) {
+    if(strcmp(comando[0], "exit") == 0) {     //Si se escribe "exit" se termina ded ejecutar el programa
         raise(SIGTERM);
     }
 
-    if(strcmp(comando[0], "!!") == 0){
+    if(strcmp(comando[0], "!!") == 0) {
         return usar_comando_anterior();
     }
 
-    if(strcmp(comando[0], "cd") == 0){
+    if(strcmp(comando[0], "cd") == 0) {
         return change_directory_command(comando);
     }
 
-    if(strcmp(comando[0], "set") == 0){
+    if(strcmp(comando[0], "set") == 0) {
         return timer_command(comando);
     }
 
-    if(strcmp(comando[0], "favs") == 0){
+    if(strcmp(comando[0], "favs") == 0) {
         return favs_command(comando);
     }
 

@@ -24,7 +24,7 @@ void sigint_handler(int sig) {
     pid_t pgrp = getpgrp();  // Obtener el ID del grupo de procesos
 
     if (kill(c_pid, SIGKILL) < 0) {  // Matar todos los procesos en el grupo de procesos actual
-        perror("Ocurrió un error al matar a los procesos hijos");
+        perror(ROJO "Ocurrió un error al matar a los procesos hijos" RESET_COLOR);
         liberar_comandos();
         liberar_cache();
         exit(EXIT_FAILURE);

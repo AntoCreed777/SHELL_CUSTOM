@@ -27,6 +27,8 @@ char ***entrada_comandos(){
     
     if (buffer_leido == -1){
         printf(ROJO "ERROR AL LEER INPUT" RESET_COLOR);
+        liberar_comandos();
+        liberar_cache();
         return NULL;
     }
     if(is_empty_linea(cadena)) 
@@ -44,7 +46,8 @@ char ***entrada_comandos(){
         comandos = (char***)realloc(comandos,sizeof(char**) * (comando+1));
 
         if(comandos == NULL){
-            perror(ROJO "Error en la reasignación de memoria");
+            perror(ROJO "Error en la reasignación de memoria" RESET_COLOR);
+            liberar_cache();
             exit(EXIT_FAILURE);
         }
         comandos[comando] = NULL;
@@ -58,7 +61,9 @@ char ***entrada_comandos(){
             comandos[comando] = (char**)realloc(comandos[comando],sizeof(char*) * (elemento+1));
 
             if(comandos[comando] == NULL){
-                perror(ROJO "Error en la reasignación de memoria");
+                perror(ROJO "Error en la reasignación de memoria" RESET_COLOR);
+                liberar_comandos();
+                liberar_cache();
                 exit(EXIT_FAILURE);
             }
 
@@ -114,8 +119,9 @@ void guardar_comandos(){
         // Reasignar memoria para el nuevo comando
         cache_comandos = (char***)realloc(cache_comandos,sizeof(char**) * (posicion + 1));
         if(cache_comandos == NULL){
-            perror(ROJO "Error en la reasignación de memoria");
+            perror(ROJO "Error en la reasignación de memoria" RESET_COLOR);
             liberar_comandos();
+            liberar_cache();
             exit(EXIT_FAILURE);
         }
 
@@ -128,7 +134,9 @@ void guardar_comandos(){
             cache_comandos[posicion] = (char**)realloc(cache_comandos[posicion],sizeof(char*) * (num_elementos+1));
             
             if(cache_comandos[posicion] == NULL){
-                perror(ROJO "Error en la reasignación de memoria");
+                perror(ROJO "Error en la reasignación de memoria" RESET_COLOR);
+                liberar_comandos();
+                liberar_cache();
                 exit(EXIT_FAILURE);
             }
 

@@ -13,7 +13,7 @@
 char *directorio_actual(){
     FILE *fp = popen("pwd","r");
 
-    if (fp == NULL) return NULL;
+    if (fp == NULL) return strdup(ROJO"ERROR"RESET_COLOR);
 
     // Leer la salida del comando
     char buffer[BUFFER_SIZE];
@@ -30,7 +30,7 @@ char *directorio_actual(){
 char *usuario_actual(){
     FILE *fp = popen("whoami","r");
     
-    if (fp == NULL) return NULL;
+    if (fp == NULL) return strdup(ROJO"ERROR"RESET_COLOR);
 
     // Leer la salida del comando
     char buffer[BUFFER_SIZE];
