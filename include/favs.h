@@ -1,7 +1,5 @@
 #pragma once
 
-extern char *archivo_favs;  //Archivo donde se guarda la lista de favoritos
-extern const char *direccion_favs;  //Archivo donde se guarda la direccion del archivo de favoritos
 extern char ***cache_comandos;
 extern int indice_inicio_anterior_linea_comando;
 

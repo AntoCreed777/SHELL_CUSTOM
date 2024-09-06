@@ -1,9 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
 #include "memoria_comandos.h"
 
 char ***comandos = NULL;
 char ***cache_comandos = NULL;
+pid_t c_pid = -1;
+int indice_inicio_anterior_linea_comando = 0;
+
+char *archivo_favs = "favs.csv";  //Archivo donde se guarda la lista de favoritos
+const char *direccion_favs = "direccion_favs.txt";  //Archivo donde se guarda la direccion del archivo de favoritos
+
 
 
 

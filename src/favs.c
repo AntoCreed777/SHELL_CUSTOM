@@ -8,10 +8,6 @@
 #include "memoria_comandos.h"
 #include "comandos.h"
 
-char *archivo_favs = "favs.csv";  //Archivo donde se guarda la lista de favoritos
-const char *direccion_favs = "direccion_favs.txt";  //Archivo donde se guarda la direccion del archivo de favoritos
-int indice_inicio_anterior_linea_comando = 0;
-
 
 void guardar_favs(){
     FILE *file = fopen(archivo_favs,"a+");
