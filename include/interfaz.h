@@ -1,6 +1,5 @@
 #pragma once
 
-extern char ***comandos;
 extern char ***cache_comandos;
 
 

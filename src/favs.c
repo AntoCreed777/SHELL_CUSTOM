@@ -5,11 +5,11 @@
 #include <string.h>
 #include "favs.h"
 #include "constantes.h"
+#include "memoria_comandos.h"
 #include "comandos.h"
 
 char *archivo_favs = "favs.csv";  //Archivo donde se guarda la lista de favoritos
 const char *direccion_favs = "direccion_favs.txt";  //Archivo donde se guarda la direccion del archivo de favoritos
-char ***cache_comandos = NULL; //Cache
 int indice_inicio_anterior_linea_comando = 0;
 
 

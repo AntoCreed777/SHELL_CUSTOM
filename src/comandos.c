@@ -10,6 +10,7 @@
 #include "interfaz.h"
 #include "constantes.h"
 #include "utils.h"
+#include "memoria_comandos.h"
 #include "favs.h"
 
 pid_t c_pid = -1;
@@ -82,23 +83,6 @@ char ***entrada_comandos(){
     free(cadena); // Liberar la cadena original
 
     return comandos;
-}
-
-void liberar_comandos(){
-    for (int i = 0; comandos[i] != NULL; i++) {
-        for (int j = 0; comandos[i][j] != NULL; j++) free(comandos[i][j]);
-        free(comandos[i]);
-    }
-    free(comandos);
-}
-
-void liberar_cache(){
-    if(cache_comandos == NULL) return;
-    for(int i=0;cache_comandos[i] != NULL;i++) {
-        for(int j=0;cache_comandos[i][j] != NULL;j++) free(cache_comandos[i][j]);
-        free(cache_comandos[i]);
-    }
-    free(cache_comandos);
 }
 
 void manejar_comandos_externos(char **comando){

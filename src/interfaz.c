@@ -6,11 +6,9 @@
 #include <sys/wait.h>
 #include "interfaz.h"
 #include "constantes.h"
+#include "memoria_comandos.h"
 #define BUFFER_SIZE 1024
 
-
-
-char ***comandos = NULL;
 
 char *directorio_actual(){
     FILE *fp = popen("pwd","r");
