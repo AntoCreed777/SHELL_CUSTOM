@@ -2,8 +2,6 @@
 #include <stdbool.h>
 
 extern char ***cache_comandos;
-extern int indice_inicio_anterior_linea_comando;
-
 
 
 void guardar_favs();

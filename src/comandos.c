@@ -97,21 +97,9 @@ char ***entrada_comandos(){
 void guardar_comandos_cache(){
     int num_comandos = 0, num_invalidos = 0, num_cache = 0;
 
-    if (cache_comandos != NULL)
-        for(int i=0;cache_comandos[i] != NULL;i++) 
-            num_cache++;
-
-    int old = indice_inicio_anterior_linea_comando;
-    indice_inicio_anterior_linea_comando = num_cache;
-
     // Procesar los nuevos comandos para guardarlos
     while(comandos[num_comandos + num_invalidos] != NULL) {
         if(strcmp(comandos[num_comandos + num_invalidos][0],"!!") == 0 || strcmp(comandos[num_comandos + num_invalidos][0],"favs") == 0) {
-            if(num_comandos == 0)
-                indice_inicio_anterior_linea_comando = old;
-            else
-                indice_inicio_anterior_linea_comando--;
-            
             num_invalidos++;
             continue;
         }

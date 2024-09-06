@@ -83,8 +83,6 @@ bool cargar_favs(){
         for(int i=0;cache_comandos[i] != NULL;i++)
             canticad_cache++;
 
-    indice_inicio_anterior_linea_comando = canticad_cache;
-
     char buffer[BUFFER_SIZE];
     while (fgets(buffer, sizeof(buffer), file) != NULL) {
         char *contexto_comando;
