@@ -14,12 +14,3 @@ bool is_empty_linea(char* linea){
     }
     return true;
 }
-
-bool is_number(char* string){
-    for(int i=0;string[i] != '\0';i++)
-        if(string[i] != '0' && string[i] != '1' && string[i] != '2' && string[i] != '3' && string[i] != '4' && string[i] != '5'
-            && string[i] != '6' && string[i] != '7' && string[i] != '8' && string[i] != '9')
-            return false;
-    
-    return true;
-}

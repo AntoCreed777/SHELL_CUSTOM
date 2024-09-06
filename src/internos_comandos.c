@@ -56,7 +56,7 @@ int manejar_comandos_internos(char **comando){
 
         else if(comando[3] == NULL) printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
 
-        else if(!is_number(comando[2])) printf(ROJO "DEBE SER UN NUMERO PARA INDICAR TIEMPO" RESET_COLOR "\n");
+        else if(atoi(comando[2]) <= 0) printf(ROJO "DEBE SER UN NUMERO MAYOR A 0 PARA INDICAR TIEMPO" RESET_COLOR "\n");
 
         else{
             pid_t pid = fork();
