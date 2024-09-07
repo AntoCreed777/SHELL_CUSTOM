@@ -5,8 +5,12 @@
 #include "memoria_comandos.h"
 
 char ***comandos = NULL;
+
+// 'cache_comandos' guarda todos los comandos que se ingresan sin repretir en la instancia actual de la shell,
+// mientras que 'comandos_anteriores' guarda los comandos que se ingresan en la ultima linea de comando
 char ***cache_comandos = NULL;
 char ***comandos_anteriores = NULL;
+
 pid_t c_pid = -1;
 int indice_inicio_anterior_linea_comando = 0;
 
