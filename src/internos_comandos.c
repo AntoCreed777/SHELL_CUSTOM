@@ -38,6 +38,7 @@ static int timer_command(char **comando) {
                 printf("%s ", comando[contador++]);
             printf("\n");
             mostrar_prompt();
+            liberar_memoria_programa();
             exit(0);
         }
         else if (pid < 0) {

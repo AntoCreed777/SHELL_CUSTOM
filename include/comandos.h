@@ -1,6 +1,7 @@
 #pragma once
 #include "internos_comandos.h"
 #include "externos_comandos.h"
+#include "memoria_comandos.h"
 
 
 extern char ***comandos;

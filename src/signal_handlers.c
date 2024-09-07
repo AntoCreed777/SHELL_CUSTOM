@@ -8,13 +8,10 @@
 #include "interfaz.h"
 #include "comandos.h"
 
-extern pid_t c_pid;
-
 //A continuacion se detallan las diferentes funciones para manejar las distintas señales
 void sigterm_handler(int sig) {
     printf(BLANCO "\nSaliendo de la SHELL\n" RESET_COLOR);
-    liberar_comandos();
-    liberar_cache();
+    liberar_memoria_programa();
     exit(0);
 }
 
@@ -25,8 +22,7 @@ void sigint_handler(int sig) {
 
     if (kill(c_pid, SIGKILL) < 0) {  // Matar todos los procesos en el grupo de procesos actual
         perror(ROJO "Ocurrió un error al matar a los procesos hijos" RESET_COLOR);
-        liberar_comandos();
-        liberar_cache();
+        liberar_memoria_programa();
         exit(EXIT_FAILURE);
     }
 }

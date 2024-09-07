@@ -46,3 +46,9 @@ void liberar_comandos_anteriores(){
     }
     free(comandos_anteriores);
 }
+
+void liberar_memoria_programa(){
+    liberar_comandos();
+    liberar_cache();
+    liberar_comandos_anteriores();
+}

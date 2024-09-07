@@ -15,3 +15,5 @@ extern const char *direccion_favs;  //Archivo donde se guarda la direccion del a
 void liberar_comandos();
 void liberar_cache();
 void liberar_comandos_anteriores();
+
+void liberar_memoria_programa();
