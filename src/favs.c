@@ -182,79 +182,34 @@ void eliminar_favs(int *numero_comando_eliminar, int cantidad_comandos_eliminar)
 }
 
 void buscar_favs(char *busqueda){
-    FILE *origenFile = fopen(archivo_favs, "r");
-
-    if (origenFile == NULL) {
-        perror(ROJO "No se pudo abrir el archivo de origen" RESET_COLOR);
-        return;
-    }
-
-
-    char buffer[BUFFER_SIZE];
-    int contador = 1;
-    while(fgets(buffer, sizeof(buffer), origenFile) != NULL){
-        if(strstr(buffer, busqueda) != NULL){
-            buffer[strcspn(buffer, ";")] = 0;
-            printf(AZUL"%d: " ROJO "%s\n" RESET_COLOR, contador, buffer);
+    for(int i=0;cache_comandos[i] != NULL;i++){
+        for(int j=0;cache_comandos[i][j] != NULL;j++){
+            if(strstr(cache_comandos[i][j], busqueda) != NULL){
+                printf(AZUL"%d: " ROJO, i+1);
+                for(int k=0;cache_comandos[i][k] != NULL;k++){
+                    printf("%s ",cache_comandos[i][k]);
+                }
+                printf("\n" RESET_COLOR);
+                break;
+            }
         }
-        contador++;
     }
 }
 
 void ejecutar_favs(int numero){
-    // En caso de que atoi arroje un numero menor a 0
-    if(numero <= 0){
-        perror(ROJO "Número invalido." RESET_COLOR);
+    int tam_cache = 0;
+
+    if (cache_comandos != NULL)
+        for(int i=0;cache_comandos[i] != NULL;i++) 
+            tam_cache++;
+
+    if(numero <= 0 || numero > tam_cache){
+        printf(ROJO "Numero invalido\n" RESET_COLOR);
         return;
     }
 
-    FILE *origenFile = fopen(archivo_favs, "r");
-
-    if (origenFile == NULL) {
-        perror(ROJO "No se pudo abrir el archivo de origen" RESET_COLOR);
-        return;
-    }
-
-    char buffer[BUFFER_SIZE];
-    int contador = 1;
-    // Buscamos la posicion de el comando
-    while(fgets(buffer, sizeof(buffer), origenFile) != NULL){
-        if(contador++ == numero){
-            // Quitamos valores sobrantes e innecesarios
-            buffer[strcspn(buffer, ";")] = 0;
-            buffer[strcspn(buffer, "\n")] = '\0';
-
-            char **comando_ejecutar = NULL;
-            int tamaño = 0;
-
-            char *token = strtok(buffer, " ");
-            // Creamos el array de comandos para poder pasarlo a manejo de comandos
-            while (token != NULL) {
-                comando_ejecutar = (char **)realloc(comando_ejecutar, sizeof(char *) * ++tamaño);
-                if (comando_ejecutar == NULL) {
-                    perror(ROJO "Error en la reasignación de memoria" RESET_COLOR);
-                    liberar_comandos();
-                    liberar_cache();
-                    exit(EXIT_FAILURE);
-                }
-                comando_ejecutar[tamaño - 1] = strdup(token);
-                token = strtok(NULL, " ");
-            }
-            // Ultimo comando lo dejamos en NULl
-            comando_ejecutar = (char **)realloc(comando_ejecutar, sizeof(char *) * (tamaño + 1));
-            comando_ejecutar[tamaño] = NULL;
-
-            if(manejar_comandos_internos(comando_ejecutar)) continue;
-            manejar_comandos_externos(comando_ejecutar);
-
-            // Liberar memoria xd
-            for (int i = 0; i < tamaño; i++) {
-                free(comando_ejecutar[i]);
-            }
-            free(comando_ejecutar);
-        }
-    }
-    fclose(origenFile);
+    if(manejar_comandos_internos(cache_comandos[numero-1])) return;
+    manejar_comandos_externos(cache_comandos[numero-1]);
 }
 
 void guardar_ruta_favs(){
