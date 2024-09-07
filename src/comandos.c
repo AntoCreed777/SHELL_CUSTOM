@@ -97,6 +97,11 @@ char ***entrada_comandos(){
 void guardar_comandos_cache(){
     int num_comandos = 0, num_invalidos = 0, num_cache = 0;
 
+    if (cache_comandos != NULL)
+        for(int i=0;cache_comandos[i] != NULL;i++) 
+            num_cache++;
+
+
     // Procesar los nuevos comandos para guardarlos
     while(comandos[num_comandos + num_invalidos] != NULL) {
         if(strcmp(comandos[num_comandos + num_invalidos][0],"!!") == 0 || strcmp(comandos[num_comandos + num_invalidos][0],"favs") == 0) {
@@ -104,10 +109,10 @@ void guardar_comandos_cache(){
             continue;
         }
 
-        int posicion = num_cache + num_comandos;
+        int posicion_cache = num_cache + num_comandos;
 
         // Reasignar memoria para el nuevo comando
-        cache_comandos = (char***)realloc(cache_comandos,sizeof(char**) * (posicion + 1));
+        cache_comandos = (char***)realloc(cache_comandos,sizeof(char**) * (posicion_cache + 1));
         if(cache_comandos == NULL){
             perror(ROJO "Error en la reasignación de memoria" RESET_COLOR);
             liberar_comandos();
@@ -115,27 +120,27 @@ void guardar_comandos_cache(){
             exit(EXIT_FAILURE);
         }
 
-        cache_comandos[posicion] = NULL;
+        cache_comandos[posicion_cache] = NULL;
 
         int num_elementos = 0;
         
         // Copiar los elementos del comando
         while(comandos[num_comandos + num_invalidos][num_elementos] != NULL){    // Elementos del Comando
-            cache_comandos[posicion] = (char**)realloc(cache_comandos[posicion],sizeof(char*) * (num_elementos+1));
+            cache_comandos[posicion_cache] = (char**)realloc(cache_comandos[posicion_cache],sizeof(char*) * (num_elementos+1));
             
-            if(cache_comandos[posicion] == NULL){
+            if(cache_comandos[posicion_cache] == NULL){
                 perror(ROJO "Error en la reasignación de memoria" RESET_COLOR);
                 liberar_comandos();
                 liberar_cache();
                 exit(EXIT_FAILURE);
             }
 
-            cache_comandos[posicion][num_elementos] = strdup(comandos[num_comandos + num_invalidos][num_elementos]);
+            cache_comandos[posicion_cache][num_elementos] = strdup(comandos[num_comandos + num_invalidos][num_elementos]);
             num_elementos++;
         }
         // Terminar el array de elementos del comando con NULL
-        cache_comandos[posicion] = (char**)realloc(cache_comandos[posicion],sizeof(char*) * (num_elementos+1));
-        cache_comandos[posicion][num_elementos] = NULL;
+        cache_comandos[posicion_cache] = (char**)realloc(cache_comandos[posicion_cache],sizeof(char*) * (num_elementos+1));
+        cache_comandos[posicion_cache][num_elementos] = NULL;
         num_comandos++;
     }
 
