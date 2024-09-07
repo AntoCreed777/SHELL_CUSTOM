@@ -168,7 +168,7 @@ void eliminar_favs(int *numero_comando_eliminar, int cantidad_numeros_eliminar){
         }
     }
 
-    char ***aux = (char***)malloc(tam_nuevo  * sizeof(char**));
+    char ***aux = (char***)malloc((tam_nuevo+1)  * sizeof(char**));
 
     // Validacion si el numero es el correcto para eliminarlo
     bool estado_eliminar = false;
@@ -183,8 +183,9 @@ void eliminar_favs(int *numero_comando_eliminar, int cantidad_numeros_eliminar){
         }
         if(!estado_eliminar) {
             aux[aux_index] = NULL;  // Inicializamos el aux[aux_index]
-            for(int i = 0; cache_comandos[contador][i] != NULL; i++) {
-                aux[aux_index] = (char **)realloc(aux[aux_index], (i + 1) * sizeof(char*));
+            int cantidad_elementos = 0;
+            while(cache_comandos[contador][cantidad_elementos] != NULL) {
+                aux[aux_index] = (char **)realloc(aux[aux_index], (cantidad_elementos + 1) * sizeof(char*));
                 if(aux[aux_index] == NULL) {
                     printf("Error al reservar memoria");
                     liberar_comandos();
@@ -192,11 +193,15 @@ void eliminar_favs(int *numero_comando_eliminar, int cantidad_numeros_eliminar){
                     liberar_comandos_anteriores();
                     exit(EXIT_FAILURE);
                 }
-                aux[aux_index][i] = strdup(cache_comandos[contador][i]);
+                aux[aux_index][cantidad_elementos] = strdup(cache_comandos[contador][cantidad_elementos]);
+                cantidad_elementos++;
             }
+            aux[aux_index] = (char **)realloc(aux[aux_index], (cantidad_elementos + 1) * sizeof(char*));
+            aux[aux_index][cantidad_elementos] = NULL;
             aux_index++;
         }
     }
+    aux[tam_nuevo] = NULL;
 
     char ***aux2;
     aux2 = cache_comandos;
