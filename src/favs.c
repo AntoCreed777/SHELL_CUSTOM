@@ -35,7 +35,7 @@ void borrar_favs(){
 }
 
 void mostrar_favs(){
-    if (cache_comandos == NULL){
+    if (cache_comandos == NULL || !cache_comandos[0]){
         printf(AMARILLO "No hay comandos favoritos\n" RESET_COLOR);
         return;
     }
