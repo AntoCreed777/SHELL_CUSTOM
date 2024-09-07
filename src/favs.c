@@ -10,7 +10,7 @@
 
 
 void guardar_favs(){
-    FILE *file = fopen(archivo_favs,"a+");
+    FILE *file = fopen(archivo_favs,"w");
     if (file == NULL) {
         perror(ROJO "Error al abrir el archivo" RESET_COLOR);
         return;
