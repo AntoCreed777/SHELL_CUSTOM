@@ -101,10 +101,14 @@ void guardar_comandos_cache(){
         for(int i=0;cache_comandos[i] != NULL;i++) 
             num_cache++;
 
-
     // Procesar los nuevos comandos para guardarlos
     while(comandos[num_comandos + num_invalidos] != NULL) {
-        if(strcmp(comandos[num_comandos + num_invalidos][0],"!!") == 0 || strcmp(comandos[num_comandos + num_invalidos][0],"favs") == 0) {
+        bool guardado_ignorado = 
+            is_in_cache(comandos[num_comandos + num_invalidos], cache_comandos) ||
+            strcmp(comandos[num_comandos + num_invalidos][0],"!!") == 0 ||
+            strcmp(comandos[num_comandos + num_invalidos][0],"favs") == 0;
+
+        if(guardado_ignorado) {
             num_invalidos++;
             continue;
         }
