@@ -124,45 +124,64 @@ bool cargar_favs(){
     
 }
 
-void eliminar_favs(int *numero_comando_eliminar, int cantidad_comandos_eliminar){
-    for(int i = 0; i < cantidad_comandos_eliminar; i++){
-        if(numero_comando_eliminar[i] <= 0) perror(ROJO "Numero invalido." RESET_COLOR);
-    }
+void eliminar_favs(int *numero_comando_eliminar, int cantidad_numeros_eliminar){
 
-    FILE *origenFile = fopen(archivo_favs, "r");
-    FILE *origen_temporal = fopen("temp.csv", "w");
+    int tam_cache = 0;
 
-    if (origenFile == NULL || origen_temporal == NULL) {
-        perror(ROJO "No se pudo abrir el archivo de origen" RESET_COLOR);
-        return;
-    }
-
-    int contador = 1;
-    char buffer[BUFFER_SIZE];
-    bool estado_eliminar = false;
+    if (cache_comandos != NULL)
+        for(int i=0;cache_comandos[i] != NULL;i++) 
+            tam_cache++;
     
-    // Valido que el contador no sea igual a ninguno de los numeros.
-    while(fgets(buffer, sizeof(buffer), origenFile)){
-        estado_eliminar = false;
-        for(int i = 0; i < cantidad_comandos_eliminar; i++)
-            if(contador == numero_comando_eliminar[i]) {
-                estado_eliminar = true;
-                numero_comando_eliminar[i] = -1;
-            }
-            
-        if(!estado_eliminar) fputs(buffer, origen_temporal);
-        contador++;
+    int tam_nuevo = tam_cache - cantidad_numeros_eliminar;
+
+    for(int i = 0; i < cantidad_numeros_eliminar; i++){
+        if(numero_comando_eliminar[i] <= 0 || numero_comando_eliminar[i] > tam_cache){
+            printf(ROJO "Numero invalido\n" RESET_COLOR);
+            return;
+        }
     }
 
-    for(int i = 0; i < cantidad_comandos_eliminar; i++)
-        if(numero_comando_eliminar[i] > 0)
-            printf(AMARILLO "Numero invalido: %d\n" RESET_COLOR, numero_comando_eliminar[i]);
+    char ***aux = (char***)malloc(tam_nuevo  * sizeof(char**));
 
-    fclose(origen_temporal);
-    fclose(origenFile);
+    // Validacion si el numero es el correcto para eliminarlo
+    bool estado_eliminar = false;
 
-    remove(archivo_favs);
-    rename("temp.csv", archivo_favs);
+    for(int contador = 0, aux_index = 0; contador < tam_cache; contador++) {
+        estado_eliminar = false;
+        for(int j = 0; j < cantidad_numeros_eliminar; j++) {
+            if(contador + 1 == numero_comando_eliminar[j]) {
+                estado_eliminar = true;
+                break;
+            }
+        }
+        if(!estado_eliminar) {
+            aux[aux_index] = NULL;  // Inicializamos el aux[aux_index]
+            for(int i = 0; cache_comandos[contador][i] != NULL; i++) {
+                aux[aux_index] = (char **)realloc(aux[aux_index], (i + 1) * sizeof(char*));
+                if(aux[aux_index] == NULL) {
+                    printf("Error al reservar memoria");
+                    liberar_comandos();
+                    liberar_cache();
+                    liberar_comandos_anteriores();
+                    exit(EXIT_FAILURE);
+                }
+                aux[aux_index][i] = strdup(cache_comandos[contador][i]);
+            }
+            aux_index++;
+        }
+    }
+
+    char ***aux2;
+    aux2 = cache_comandos;
+    cache_comandos = aux;
+
+    for(int i = 0; aux2[i] != NULL; i++){
+        for(int j = 0; aux2[i][j] != NULL; j++){
+            free(aux2[i][j]);
+        }
+        free(aux2[i]);
+    }
+    free(aux2);
 }
 
 void buscar_favs(char *busqueda){
@@ -209,6 +228,7 @@ void guardar_ruta_favs(){
 }
 
 void cargar_ruta_favs(){
+
     printf(AMARILLO "Cargando archivo de favoritos...\n" RESET_COLOR);
     FILE *file = fopen(direccion_favs, "r");
     if (file == NULL) {
