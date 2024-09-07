@@ -182,22 +182,17 @@ void eliminar_favs(int *numero_comando_eliminar, int cantidad_comandos_eliminar)
 }
 
 void buscar_favs(char *busqueda){
-    FILE *origenFile = fopen(archivo_favs, "r");
-
-    if (origenFile == NULL) {
-        perror(ROJO "No se pudo abrir el archivo de origen" RESET_COLOR);
-        return;
-    }
-
-
-    char buffer[BUFFER_SIZE];
-    int contador = 1;
-    while(fgets(buffer, sizeof(buffer), origenFile) != NULL){
-        if(strstr(buffer, busqueda) != NULL){
-            buffer[strcspn(buffer, ";")] = 0;
-            printf(AZUL"%d: " ROJO "%s\n" RESET_COLOR, contador, buffer);
+    for(int i=0;cache_comandos[i] != NULL;i++){
+        for(int j=0;cache_comandos[i][j] != NULL;j++){
+            if(strstr(cache_comandos[i][j], busqueda) != NULL){
+                printf(AZUL"%d: " ROJO, i+1);
+                for(int k=0;cache_comandos[i][k] != NULL;k++){
+                    printf("%s ",cache_comandos[i][k]);
+                }
+                printf("\n" RESET_COLOR);
+                break;
+            }
         }
-        contador++;
     }
 }
 
