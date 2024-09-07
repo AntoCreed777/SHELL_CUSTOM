@@ -28,47 +28,31 @@ void guardar_favs(){
 }
 
 void borrar_favs(){
-    printf(AMARILLO "Borrando Archivo: " AZUL "%s\n" RESET_COLOR, archivo_favs);
+    printf(AMARILLO "Borrando memoria de los favs\n");
+    liberar_cache();
+    cache_comandos = NULL;
 
-    if(access(archivo_favs, F_OK) != 0) return; //Si no existe el archivo
-
-    if (remove(archivo_favs) != 0){
-        perror(ROJO "Error al eliminar el archivo de favoritos" RESET_COLOR);
-        return;
-    }
-    else{
-        archivo_favs = "favs.csv";
-        printf(AMARILLO "Archivo de favoritos eliminado exitosamente\n" RESET_COLOR);
-        printf(AMARILLO "Se creará/usara un archivo de favoritos por defecto.\n" RESET_COLOR);
-
-        if(access(direccion_favs, F_OK) != 0) return; //Si no existe el archivo
-
-        if (remove(direccion_favs) != 0){
-            perror(ROJO "Error al eliminar el archivo de dirección de favoritos" RESET_COLOR);
-            return;
-        }
-    }
 }
 
 void mostrar_favs(){
-    if(access(archivo_favs, F_OK) != 0) return; //Si no existe el archivo
-
-    FILE *file = fopen(archivo_favs,"r");
-    if (file == NULL) {
-        perror(ROJO "Error al abrir el archivo" RESET_COLOR);
+    if (cache_comandos == NULL){
+        printf(AMARILLO "No hay comandos favoritos\n" RESET_COLOR);
         return;
     }
 
-    int contador = 1;
-    char buffer[BUFFER_SIZE];
-    while (fgets(buffer, sizeof(buffer), file) != NULL) {
-        if(contador == 1) printf("Comandos Favoritos:\n");
-        buffer[strcspn(buffer, ";")] = 0;  // Eliminar el salto de línea
-        printf(AZUL"%d: " ROJO "%s\n" RESET_COLOR, contador++, buffer);
+    int i = 0;
+    printf("Comandos Favoritos:\n");
+    while(cache_comandos[i]){
+        int j = 0;
+        printf(AZUL "%d:  ", i + 1);
+        while (cache_comandos[i][j]){
+            printf(ROJO "%s ", cache_comandos[i][j]);
+            j++; 
+        }
+        printf("\n");
+        i++;
     }
-    if(contador == 1) printf(AMARILLO "No hay comandos favoritos\n" RESET_COLOR);
-
-    fclose(file);
+    return;
 }
 
 bool cargar_favs(){
