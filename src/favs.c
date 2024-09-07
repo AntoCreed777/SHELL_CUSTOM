@@ -62,57 +62,84 @@ bool cargar_favs(){
         return false;
     }
 
+    // Contamos los comandos en cache
     int canticad_cache = 0;
     if(cache_comandos != NULL)
         for(int i=0;cache_comandos[i] != NULL;i++)
             canticad_cache++;
 
+
     char buffer[BUFFER_SIZE];
+
+    // Empezamos a leer los comandos de los archivos
     while (fgets(buffer, sizeof(buffer), file) != NULL) {
+        // Creamos comparador
+        int largo_comando_token[canticad_cache];
+        int comparador_token[canticad_cache];
+
+        for(int i = 0; i < canticad_cache; i++){
+            largo_comando_token[i] = 0;
+            comparador_token[i] = 0;
+        }
+        
+        // Creamos el token para sacar los comandos de el archivo
+
         char *contexto_comando;
-
         char *token_comando = strtok_r(buffer,";\n",&contexto_comando); // Separo por ';' eliminando el '\n'
-
+        
+        // While para ver si el largo es correspondiente a si los comandos estan contenidos en el comando del archivo
         while(token_comando != NULL){
-            cache_comandos = (char***)realloc(cache_comandos,sizeof(char**) * (canticad_cache+1));
-
-            if(cache_comandos == NULL){
-                perror(ROJO "Error en la reasignación de memoria" RESET_COLOR);
-                liberar_comandos();
-                exit(EXIT_FAILURE);
+            for(int i = 0; i < canticad_cache; i++){
+                for(int j = 0; cache_comandos[i][j] != NULL; j++){
+                    if(strstr(token_comando, cache_comandos[i][j]) != NULL) comparador_token[i]++;
+                    largo_comando_token[i]++;
+                }
             }
 
-            cache_comandos[canticad_cache] = NULL;
+            bool estado_colocar_comando = true;
+            for(int i = 0; i < canticad_cache; i++){
+                if(largo_comando_token[i] == comparador_token[i]){
+                    estado_colocar_comando = false;
+                    break;
+                }
+            }
 
-            int elemento = 0;
-            char *contexto_elemento;
-            char *token_elementos = strtok_r(token_comando," ",&contexto_elemento); // Separo por ' ' (espacio)
-
-            while(token_elementos != NULL){
-
-                cache_comandos[canticad_cache] = (char**)realloc(cache_comandos[canticad_cache],sizeof(char*) * (elemento+1));
-
-                if(cache_comandos[canticad_cache] == NULL){
+            if(estado_colocar_comando){
+                char ***temp = (char***)realloc(cache_comandos, sizeof(char**) * (canticad_cache + 1));
+                if (temp == NULL) {
                     perror(ROJO "Error en la reasignación de memoria" RESET_COLOR);
                     liberar_comandos();
-                    liberar_cache();
                     exit(EXIT_FAILURE);
                 }
+                cache_comandos = temp;
 
-                cache_comandos[canticad_cache][elemento] = strdup(token_elementos);
+                cache_comandos[canticad_cache] = NULL;
 
-                elemento++;
-                token_elementos = strtok_r(NULL," ",&contexto_elemento);
+                int elemento = 0;
+                char *contexto_elemento;
+                char *token_elementos = strtok_r(token_comando," ",&contexto_elemento);
+
+                while(token_elementos != NULL){
+                    char **temp_cmd = (char**)realloc(cache_comandos[canticad_cache], sizeof(char*) * (elemento + 1));
+                    if (temp_cmd == NULL) {
+                        perror(ROJO "Error en la reasignación de memoria" RESET_COLOR);
+                        fclose(file);
+                        liberar_comandos();
+                        exit(EXIT_FAILURE);
+                    }
+                    cache_comandos[canticad_cache] = temp_cmd;
+                    cache_comandos[canticad_cache][elemento++] = strdup(token_elementos);
+                    token_elementos = strtok_r(NULL," ",&contexto_elemento);
+                }
+                cache_comandos[canticad_cache] = (char**)realloc(cache_comandos[canticad_cache], sizeof(char*) * (elemento + 1));
+                cache_comandos[canticad_cache][elemento] = NULL;
+
+                canticad_cache++;
+                
             }
-
-            // Añadimos un NULL al final del array para marcar el fin del comando
-            cache_comandos[canticad_cache] = (char **)realloc(cache_comandos[canticad_cache], sizeof(char*) * (elemento+1));
-            cache_comandos[canticad_cache][elemento] = NULL;
-
+            // Cambio de comando
             token_comando = strtok_r(NULL,";\n",&contexto_comando);
-
-            canticad_cache++;
-
+            
         }
 
         // Añadimos un NULL al final del array para marcar el fin de los comandos
