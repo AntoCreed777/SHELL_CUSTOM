@@ -52,7 +52,7 @@ void mostrar_favs(){
     }
 
     int i = 0;
-    printf("Comandos Favoritos:\n");
+    printf(CIAN "Comandos Favoritos:\n" RESET_COLOR);
     while(cache_comandos[i] != NULL){
         int j = 0;
         printf(AZUL "%d:  ", i + 1);
