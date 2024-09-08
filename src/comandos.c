@@ -30,8 +30,10 @@ char ***entrada_comandos(){
         liberar_memoria_programa();
         return NULL;
     }
-    if(is_empty_linea(cadena)) 
-        return NULL; //Si no se ingresa ningun comando, (solamente ingresa '\n')
+    if(is_empty_linea(cadena)) {    //Si no se ingresa ningun comando, (solamente ingresa '\n')
+        free(cadena);
+        return NULL;
+    }
 
     eliminar_tabs(cadena); // Eliminar los tabs de la cadena
 
