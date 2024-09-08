@@ -55,5 +55,6 @@ void liberar_memoria_programa(){
     liberar_comandos();
     liberar_cache();
     liberar_comandos_anteriores();
-    free(archivo_favs);
+    if (direccion_favs != NULL) free(direccion_favs);
+    if (archivo_favs != NULL) free(archivo_favs);
 }

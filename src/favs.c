@@ -274,8 +274,19 @@ void guardar_ruta_favs(){
 
     fclose(file);
 }
-
 void cargar_ruta_favs() {
+    // Verificar que direccion_favs esté inicializado
+    if (direccion_favs == NULL) {
+        printf("Direccion de favoritos no inicializada.\n");
+        return;
+    }
+
+    // Verificar que direccion_favs no sea una cadena vacía
+    if (strlen(direccion_favs) == 0) {
+        printf("Direccion de favoritos vacía.\n");
+        return;
+    }
+
     FILE *file = fopen(direccion_favs, "r");
     if (file == NULL) {
         perror(ROJO "Error al abrir el archivo de dirección de favoritos" RESET_COLOR);

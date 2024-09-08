@@ -213,13 +213,26 @@ void guardar_comandos_anteriores(){
     comandos_anteriores[num_comandos] = NULL;
 }
 
-void cargar_ruta_direccion_favs(){
+//FUNCION CREADA CON CHAT GPT
+void cargar_ruta_direccion_favs() {
     char ruta[PATH_MAX];        // PATH_MAX es el límite máximo para la longitud de una ruta en el sistema
     ssize_t len = readlink("/proc/self/exe", ruta, sizeof(ruta) - 1);  // "self" representa el PID actual
     
     if (len != -1) {
-        ruta[len] = '\0';
-        direccion_favs = dirname(ruta);
+        ruta[len] = '\0';  // Null-terminar la ruta
+        char *dir = dirname(ruta);  // dirname modifica "ruta", pero no crea una nueva cadena
+
+        // Asignar memoria para direccion_favs y concatenar la ruta
+        if (direccion_favs != NULL) free(direccion_favs);
+        
+        direccion_favs = malloc(strlen(dir) + strlen("/direccion_favs.txt") + 1);
+        if (direccion_favs == NULL) {
+            perror("Error al asignar memoria para direccion_favs");
+            liberar_memoria_programa();
+            exit(EXIT_FAILURE);
+        }
+
+        strcpy(direccion_favs, dir);
         strcat(direccion_favs, "/direccion_favs.txt");
     }
     else {
