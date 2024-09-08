@@ -70,16 +70,29 @@ static int timer_command(char **comando, int num_comandos) {
     return 1;
 }
 
-static int change_directory_command(char **comando) {
-    if (comando[1] == NULL) printf(ROJO "FALTA UN ARGUMENTO" RESET_COLOR "\n");
+static int change_directory_command(char **comando, int num_comandos) {
+    if (comando[1] == NULL) {
+        printf(ROJO "FALTA UN ARGUMENTO" RESET_COLOR "\n");
+        comandos_validos[num_comandos] = false;
+    }
     else if (strcmp(comando[1], "~") == 0) { // Implementacion del comando para dirigirse al Directorio Raiz
         char *home_dir = getenv("HOME");
         if (home_dir != NULL) {
-            if (chdir(home_dir) != 0) printf(ROJO "Error al ingresar al Directorio HOME" RESET_COLOR "\n");
+            if (chdir(home_dir) != 0){
+                printf(ROJO "Error al ingresar al Directorio HOME" RESET_COLOR "\n");
+                comandos_validos[num_comandos] = false;
+            }
         }
-        else printf(ROJO "Variable de entorno HOME no está definida" RESET_COLOR "\n");
+        else {
+            printf(ROJO "Variable de entorno HOME no está definida" RESET_COLOR "\n");
+            comandos_validos[num_comandos] = false;
+        }
     }
-    else if (chdir(comando[1]) != 0) perror(ROJO "Error al ingresar al Directorio" RESET_COLOR);
+    else if (chdir(comando[1]) != 0){
+        printf(ROJO "Error al ingresar al Directorio\n" RESET_COLOR);
+        comandos_validos[num_comandos] = false;
+    }
+    else comandos_validos[num_comandos] = true;
 
     return 1;
 }
@@ -210,7 +223,7 @@ int manejar_comandos_internos(char **comando, int num_comandos) {
     }
 
     if(strcmp(comando[0], "cd") == 0) {
-        return change_directory_command(comando);
+        return change_directory_command(comando, num_comandos);
     }
 
     if(strcmp(comando[0], "set") == 0) {
