@@ -10,6 +10,6 @@ run: ./shell.out
 # Regla para debugear el programa
 debug: ./shell.out
 	@gdb ./shell.out
-# Regla para comparar las fugas de memoria
+# Regla para investigar las fugas de memoria
 memoria: ./shell.out
 	@valgrind --leak-check=full ./shell.out
