@@ -16,7 +16,7 @@ void guardar_favs(){
         return;
     }
 
-    if(cache_comandos == NULL || cache_comandos[0] != NULL){
+    if(cache_comandos == NULL || cache_comandos[0] == NULL){
         printf(AMARILLO "No hay comandos favoritos para guardar\n" RESET_COLOR);
         return;
     }
