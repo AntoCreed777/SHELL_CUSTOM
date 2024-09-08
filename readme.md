@@ -26,27 +26,27 @@ El codigo esta compilado con gcc en linux. Las distribuciones utilizadas en el t
 
 Las version de gcc recomendada para compilar el proyecto es *gcc (GCC) 14.2.1*. 
 ### Comandos para ejecutar el código 
-Para compilarlo y ejecutarlo simplemente ejecute ``` make run``` despues de clonar el repositorio en el directorio del mismo.
+Para compilarlo y ejecutarlo simplemente ejecute ```make run``` despues de clonar el repositorio en el directorio del mismo.
 
 Si make llegase a fallar se puede ejecutar el comando manualmente con:
 
-``` gcc -I ./include -o shell.out ./src/interfaz.c ./src/signal_handlers.c ./src/main.c ./src/comandos.c ./src/utils.c ./src/favs.c ./src/memoria_comandos.c ./src/internos_comandos.c ./src/externos_comandos.c```
+```gcc -I ./include -o shell.out ./src/interfaz.c ./src/signal_handlers.c ./src/main.c ./src/comandos.c ./src/utils.c ./src/favs.c ./src/memoria_comandos.c ./src/internos_comandos.c ./src/externos_comandos.c```
 
-Después de compilarlo simplemente ejecutar ``` ./shell.out ``` en el directorio del proyecto.
+Después de compilarlo simplemente ejecutar ```./shell.out ``` en el directorio del proyecto.
 
 ## Comandos propios
 Dentro de la ejecucion de nuestra shell ejecutamos distintos comandos propios. Dentro de estos los que debemos destacar son los de favoritos y los de set recordatorio.
 
-Vamos a dejar las variables que tiene que ingresar el usuario bajo la estructura ``` $(variable) ```.
+Vamos a dejar las variables que tiene que ingresar el usuario bajo la estructura ```$(variable)```.
 
 ### Comando: set recordatorio
 Establece un recordatorio que se activara después de cierto tiempo. El tiempo se establece en segundos.
 
 Para set recordatorio la estructura es la siguiente:
 
-``` set recordatorio $(tiempo) $(mensaje)```
+```set recordatorio $(tiempo) $(mensaje)```
 #### Ejemplo
-``` set recordatorio 10 hola mundo```
+```set recordatorio 10 hola mundo```
 
 Esto creara un recordatorio en 10 segundos con el mensaje hola mundo.
 
