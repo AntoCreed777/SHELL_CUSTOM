@@ -123,7 +123,10 @@ void manejar_comandos_externos(char **comando, int num_comando){
                 exit(EXIT_FAILURE);
             }
             
-            if(num_comando == -1) continue;
+            if(num_comando == -1) {
+                indice_pipes++;
+                continue;
+            }
 
             if (WIFEXITED(status)) {
                 if (WEXITSTATUS(status) == 0) comandos_validos[num_comando] = true;
@@ -139,7 +142,4 @@ void manejar_comandos_externos(char **comando, int num_comando){
         }
         indice_pipes++;
     }
-
-
-
 }
