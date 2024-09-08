@@ -28,6 +28,7 @@ void manejar_comandos_externos(char **comando){
             waitpid(c_pid, NULL, 0);
         } else {
             perror(ROJO "fork" RESET_COLOR);
+            liberar_memoria_programa();
             exit(EXIT_FAILURE);
         }
         return;
@@ -67,8 +68,7 @@ void manejar_comandos_externos(char **comando){
             if (indice_pipes > 0) {
                 if (dup2(pidfc[indice_pipes - 1][0], STDIN_FILENO) == -1) {
                     perror(ROJO "dup2 input" RESET_COLOR);
-                    liberar_comandos();
-                    liberar_cache();
+                    liberar_memoria_programa();
                     exit(EXIT_FAILURE);
                 }
             }
@@ -77,8 +77,7 @@ void manejar_comandos_externos(char **comando){
             if (indice_pipes < num_pipe) {
                 if (dup2(pidfc[indice_pipes][1], STDOUT_FILENO) == -1) {
                     perror(ROJO "dup2 output" RESET_COLOR);
-                    liberar_comandos();
-                    liberar_cache();
+                    liberar_memoria_programa();
                     exit(EXIT_FAILURE);
                 }
             }
@@ -91,13 +90,11 @@ void manejar_comandos_externos(char **comando){
 
             execvp(comando_actual[0], comando_actual);
             perror(ROJO "execvp" RESET_COLOR);  // Se muestra solo si execvp falla
-            liberar_comandos();
-            liberar_cache();
+            liberar_memoria_programa();
             exit(EXIT_FAILURE);  // Terminar si execvp falla
         } else if (c_pid < 0) {
             perror(ROJO "fork" RESET_COLOR);
-            liberar_comandos();
-            liberar_cache();
+            liberar_memoria_programa();
             exit(EXIT_FAILURE);
         }
         indice_pipes++;

@@ -20,7 +20,7 @@ void guardar_favs(){
         printf(AMARILLO "No hay comandos favoritos para guardar\n" RESET_COLOR);
         return;
     }
-    
+
     for(int i=0; cache_comandos[i] != NULL;i++){
         for(int j=0;cache_comandos[i][j] != NULL;j++){
             fprintf(file,"%s ",cache_comandos[i][j]);
@@ -112,7 +112,8 @@ bool cargar_favs(){
                 char ***temp = (char***)realloc(cache_comandos, sizeof(char**) * (canticad_cache + 1));
                 if (temp == NULL) {
                     perror(ROJO "Error en la reasignación de memoria" RESET_COLOR);
-                    liberar_comandos();
+                    fclose(file);
+                    liberar_memoria_programa();
                     exit(EXIT_FAILURE);
                 }
                 cache_comandos = temp;
@@ -192,9 +193,7 @@ void eliminar_favs(int *numero_comando_eliminar, int cantidad_numeros_eliminar){
                 aux[aux_index] = (char **)realloc(aux[aux_index], (cantidad_elementos + 1) * sizeof(char*));
                 if(aux[aux_index] == NULL) {
                     printf("Error al reservar memoria");
-                    liberar_comandos();
-                    liberar_cache();
-                    liberar_comandos_anteriores();
+                    liberar_memoria_programa();
                     exit(EXIT_FAILURE);
                 }
                 aux[aux_index][cantidad_elementos] = strdup(cache_comandos[contador][cantidad_elementos]);
@@ -255,8 +254,7 @@ void guardar_ruta_favs(){
         FILE *file = fopen(direccion_favs, "w");
         if (file == NULL) {
             perror(ROJO "Error al abrir el archivo de dirección de favoritos" RESET_COLOR);
-            liberar_comandos();
-            liberar_cache();
+            liberar_memoria_programa();
             exit(EXIT_FAILURE);
         }
         fputs(archivo_favs, file);
@@ -275,8 +273,7 @@ void cargar_ruta_favs(){
         archivo_favs = (char*)malloc(256 * sizeof(char));  // Reserva espacio para 256 caracteres
         if (archivo_favs == NULL) {
             perror(ROJO "Error al asignar memoria para archivo_favs" RESET_COLOR);
-            liberar_comandos();
-            liberar_cache();
+            liberar_memoria_programa();
             exit(EXIT_FAILURE);
         }
         fscanf(file, "%s", archivo_favs);

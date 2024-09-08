@@ -27,8 +27,7 @@ char ***entrada_comandos(){
     
     if (buffer_leido == -1){
         printf(ROJO "ERROR AL LEER INPUT" RESET_COLOR);
-        liberar_comandos();
-        liberar_cache();
+        liberar_memoria_programa();
         return NULL;
     }
     if(is_empty_linea(cadena)) 
@@ -49,7 +48,7 @@ char ***entrada_comandos(){
 
         if(comandos == NULL){
             perror(ROJO "Error en la reasignación de memoria" RESET_COLOR);
-            liberar_cache();
+            liberar_memoria_programa();
             exit(EXIT_FAILURE);
         }
         comandos[comando] = NULL;
@@ -64,8 +63,7 @@ char ***entrada_comandos(){
 
             if(comandos[comando] == NULL){
                 perror(ROJO "Error en la reasignación de memoria" RESET_COLOR);
-                liberar_comandos();
-                liberar_cache();
+                liberar_memoria_programa();
                 exit(EXIT_FAILURE);
             }
 
@@ -119,8 +117,7 @@ void guardar_comandos_cache(){
         cache_comandos = (char***)realloc(cache_comandos,sizeof(char**) * (posicion_cache + 1));
         if(cache_comandos == NULL){
             perror(ROJO "Error en la reasignación de memoria" RESET_COLOR);
-            liberar_comandos();
-            liberar_cache();
+            liberar_memoria_programa();
             exit(EXIT_FAILURE);
         }
 
@@ -134,8 +131,7 @@ void guardar_comandos_cache(){
             
             if(cache_comandos[posicion_cache] == NULL){
                 perror(ROJO "Error en la reasignación de memoria" RESET_COLOR);
-                liberar_comandos();
-                liberar_cache();
+                liberar_memoria_programa();
                 exit(EXIT_FAILURE);
             }
 
@@ -172,7 +168,7 @@ void guardar_comandos_anteriores(){
         
         if(comandos_anteriores == NULL){
             perror(ROJO "Error en la reasignación de memoria");
-            liberar_comandos();
+            liberar_memoria_programa();
             exit(EXIT_FAILURE);
         }
 
