@@ -7,9 +7,15 @@
 #include "constantes.h"
 #include "memoria_comandos.h"
 #include "comandos.h"
+#include "interfaz.h"
 
 
 void guardar_favs(){
+    if (archivo_favs == NULL || access(archivo_favs, F_OK) == -1) {
+        printf(AMARILLO "El archivo de favoritos no existe\n" RESET_COLOR);
+        return;
+    }
+    
     FILE *file = fopen(archivo_favs,"w");
     if (file == NULL) {
         perror(ROJO "Error al abrir el archivo" RESET_COLOR);
@@ -61,6 +67,10 @@ void mostrar_favs(){
 }
 
 bool cargar_favs(){
+    if (archivo_favs == NULL || access(archivo_favs, F_OK) == -1) {
+        printf(AMARILLO "El archivo de favoritos no existe\n" RESET_COLOR);
+        return false;
+    }
     FILE *file = fopen(archivo_favs,"r");
     if (file == NULL) {
         perror(ROJO "Error al abrir el archivo" RESET_COLOR);
@@ -248,7 +258,7 @@ void ejecutar_favs(int numero){
         return;
     }
 
-    if(manejar_comandos_internos(cache_comandos[numero-1])) return;
+    if(manejar_comandos_internos(cache_comandos[numero-1], -1)) return;
     manejar_comandos_externos(cache_comandos[numero-1], -1);
 }
 
@@ -267,12 +277,10 @@ void guardar_ruta_favs(){
 
 void cargar_ruta_favs(){
 
-    printf(AMARILLO "Cargando archivo de favoritos...\n" RESET_COLOR);
     FILE *file = fopen(direccion_favs, "r");
     if (file == NULL) {
         perror(ROJO "Error al abrir el archivo de dirección de favoritos" RESET_COLOR);
-        printf(AMARILLO "Se creará/usara un archivo de favoritos por defecto.\n" RESET_COLOR);
-        archivo_favs = strdup("favs.csv");
+        printf(AMARILLO "No existe archivo de guardado de favoritos.\nDebera crear uno con el comando: " CIAN "favs crear $(ruta)\n" RESET_COLOR);
         return;
     }
 
