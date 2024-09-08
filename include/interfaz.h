@@ -3,7 +3,6 @@
 extern char ***cache_comandos;
 
 
-char *directorio_actual();
 char *usuario_actual();
 
 
