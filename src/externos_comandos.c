@@ -110,7 +110,29 @@ void manejar_comandos_externos(char **comando, int num_comando){
             perror(ROJO "execvp" RESET_COLOR);  // Se muestra solo si execvp falla
             liberar_memoria_programa();
             exit(EXIT_FAILURE);  // Terminar si execvp falla
-        } else if (c_pid < 0) {
+        }
+        else if (c_pid > 0) {
+            // Cerrar el pipe en el proceso padre
+            if (indice_pipes > 0) close(pidfc[indice_pipes - 1][0]);
+            if (indice_pipes < num_pipe) close(pidfc[indice_pipes][1]);
+
+            int status;
+            if (waitpid(c_pid, &status, 0) == -1) {
+                perror(ROJO "waitpid" RESET_COLOR);
+                liberar_memoria_programa();
+                exit(EXIT_FAILURE);
+            }
+            
+            if(num_comando == -1) continue;
+
+            if (WIFEXITED(status)) {
+                if (WEXITSTATUS(status) == 0) comandos_validos[num_comando] = true;
+                else comandos_validos[num_comando] = false;
+            }
+            else if (WIFSIGNALED(status))
+                comandos_validos[num_comando] = false;
+        }
+        else if (c_pid < 0) {
             perror(ROJO "fork" RESET_COLOR);
             liberar_memoria_programa();
             exit(EXIT_FAILURE);
@@ -118,14 +140,6 @@ void manejar_comandos_externos(char **comando, int num_comando){
         indice_pipes++;
     }
 
-    // Proceso padre cierra todos los descriptores de pipes
-    for (int indice_pipes = 0; indice_pipes < num_pipe; indice_pipes++) {
-        close(pidfc[indice_pipes][0]);
-        close(pidfc[indice_pipes][1]);
-    }
 
-    // Esperar a que todos los procesos hijos terminen
-    for (int j = 0; j <= num_pipe; j++) {
-        wait(NULL);
-    }
+
 }
