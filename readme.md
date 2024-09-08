@@ -2,9 +2,9 @@
 
 # Proyecto shell custom
 ## Integrantes del grupo
-- Carlos Tomás Álvarez Norambuena  (*2022433621*)
-- Antonio  Jesus Benavides Puentes (*2023455954*)
-- Javier Alejandro Campos Contreras (*2023432857*)
+- [Carlos Tomás Álvarez Norambuena](https://github.com/Karantooo)  (*2022433621*)
+- [Antonio  Jesus Benavides Puentes](https://github.com/AntoCreed777) (*2023455954*)
+- [Javier Alejandro Campos Contreras](https://github.com/huebitoo) (*2023432857*)
 
 ## Tecnologias utilizadas en el proyecto
 <p align="center">
