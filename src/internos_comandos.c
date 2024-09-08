@@ -80,19 +80,19 @@ static int change_directory_command(char **comando, int num_comandos) {
         if (home_dir != NULL) {
             if (chdir(home_dir) != 0){
                 printf(ROJO "Error al ingresar al Directorio HOME" RESET_COLOR "\n");
-                comandos_validos[num_comandos] = false;
+                if(num_comandos != -1) comandos_validos[num_comandos] = false;
             }
         }
         else {
             printf(ROJO "Variable de entorno HOME no está definida" RESET_COLOR "\n");
-            comandos_validos[num_comandos] = false;
+            if(num_comandos != -1) comandos_validos[num_comandos] = false;
         }
     }
     else if (chdir(comando[1]) != 0){
         printf(ROJO "Error al ingresar al Directorio\n" RESET_COLOR);
-        comandos_validos[num_comandos] = false;
+        if(num_comandos != -1) comandos_validos[num_comandos] = false;
     }
-    else comandos_validos[num_comandos] = true;
+    else if(num_comandos != -1) comandos_validos[num_comandos] = true;
 
     return 1;
 }
