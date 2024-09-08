@@ -1,9 +1,12 @@
 #pragma once
 #include <sys/types.h>
+#include <stdbool.h>
 
 extern char ***comandos;
 extern char ***cache_comandos;
 extern char ***comandos_anteriores;
+extern bool *comandos_validos;
+
 extern pid_t c_pid;
 
 

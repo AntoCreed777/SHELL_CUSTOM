@@ -85,7 +85,7 @@ static int usar_comando_anterior() {
     //Ejecucion de los comandos anteriores
 
     for(int i=0;comandos_anteriores[i] != NULL;i++)
-        manejar_comandos_externos(comandos_anteriores[i]);
+        manejar_comandos_externos(comandos_anteriores[i], -1);
 
     return 1;
 }

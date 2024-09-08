@@ -3,11 +3,12 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/wait.h>
+#include <stdbool.h>
 #include "memoria_comandos.h"
 #include "externos_comandos.h"
 #include "constantes.h"
 
-void manejar_comandos_externos(char **comando){
+void manejar_comandos_externos(char **comando, int num_comando){
     int num_pipe = 0;
     int i = 0;
     
@@ -24,8 +25,25 @@ void manejar_comandos_externos(char **comando){
             perror(ROJO "execvp" RESET_COLOR);  // Se muestra solo si execvp falla
             liberar_memoria_programa();
             exit(EXIT_FAILURE);  // Terminar si execvp falla
-        } else if (c_pid > 0) {
-            waitpid(c_pid, NULL, 0);
+        }
+        else if (c_pid > 0) {
+            int status;
+            
+            if (waitpid(c_pid, &status, 0) == -1) {
+                perror(ROJO "waitpid" RESET_COLOR);
+                liberar_memoria_programa();
+                exit(EXIT_FAILURE);
+            }
+
+            if(num_comando == -1) return;
+
+            if (WIFEXITED(status)) {
+                if (WEXITSTATUS(status) == 0) comandos_validos[num_comando] = true;
+                else comandos_validos[num_comando] = false;
+            }
+            else if (WIFSIGNALED(status))
+                comandos_validos[num_comando] = false;
+
         } else {
             perror(ROJO "fork" RESET_COLOR);
             liberar_memoria_programa();

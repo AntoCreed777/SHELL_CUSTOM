@@ -87,6 +87,13 @@ char ***entrada_comandos(){
     comandos = (char ***)realloc(comandos, sizeof(char**) * (comando + 1));
     comandos[comando] = NULL;
 
+    comandos_validos = (bool *)malloc(sizeof(bool) * comando);
+    if (comandos_validos == NULL) {
+        printf(ROJO "Error en la asignación de memoria" RESET_COLOR);
+        liberar_memoria_programa();
+        exit(EXIT_FAILURE);
+    }
+
     free(cadena); // Liberar la cadena original
 
     return comandos;
@@ -104,11 +111,17 @@ void guardar_comandos_cache(){
     // Procesar los nuevos comandos para guardarlos
     while(comandos[num_comandos + num_invalidos] != NULL) {
         bool guardado_ignorado = 
+            //comandos_validos[num_comandos + num_invalidos] == false ||        // No se porque no funciona aqui pero si despues
             is_in_cache(comandos[num_comandos + num_invalidos], cache_comandos) ||
             strcmp(comandos[num_comandos + num_invalidos][0],"!!") == 0 ||
             strcmp(comandos[num_comandos + num_invalidos][0],"favs") == 0;
 
         if(guardado_ignorado) {
+            num_invalidos++;
+            continue;
+        }
+
+        if (comandos_validos[num_comandos + num_invalidos] == false) {
             num_invalidos++;
             continue;
         }

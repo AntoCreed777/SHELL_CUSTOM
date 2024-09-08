@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <stdbool.h>
 #include "memoria_comandos.h"
 
 char ***comandos = NULL;
@@ -10,6 +11,8 @@ char ***comandos = NULL;
 // mientras que 'comandos_anteriores' guarda los comandos que se ingresan en la ultima linea de comando
 char ***cache_comandos = NULL;
 char ***comandos_anteriores = NULL;
+
+bool *comandos_validos = NULL;
 
 pid_t c_pid = -1;
 int indice_inicio_anterior_linea_comando = 0;
@@ -27,6 +30,7 @@ void liberar_comandos(){
         free(comandos[i]);
     }
     free(comandos);
+    if(comandos_validos != NULL) free(comandos_validos);
 }
 
 void liberar_cache(){

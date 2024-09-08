@@ -18,8 +18,6 @@ void sigterm_handler(int sig) {
 void sigint_handler(int sig) {
     if(c_pid == -1) return;
 
-    pid_t pgrp = getpgrp();  // Obtener el ID del grupo de procesos
-
     if (kill(c_pid, SIGKILL) < 0) {  // Matar todos los procesos en el grupo de procesos actual
         perror(ROJO "Ocurrió un error al matar a los procesos hijos" RESET_COLOR);
         liberar_memoria_programa();

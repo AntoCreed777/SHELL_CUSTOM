@@ -40,18 +40,18 @@ void borrar_favs(){
 }
 
 void mostrar_favs(){
-    if (cache_comandos == NULL || !cache_comandos[0]){
+    if (cache_comandos == NULL || cache_comandos[0] == NULL){
         printf(AMARILLO "No hay comandos favoritos\n" RESET_COLOR);
         return;
     }
 
     int i = 0;
     printf("Comandos Favoritos:\n");
-    while(cache_comandos[i]){
+    while(cache_comandos[i] != NULL){
         int j = 0;
         printf(AZUL "%d:  ", i + 1);
-        while (cache_comandos[i][j]){
-            printf(ROJO "%s ", cache_comandos[i][j]);
+        while (cache_comandos[i][j] != NULL){
+            printf(ROJO "%s " RESET_COLOR, cache_comandos[i][j]);
             j++; 
         }
         printf("\n");
@@ -249,7 +249,7 @@ void ejecutar_favs(int numero){
     }
 
     if(manejar_comandos_internos(cache_comandos[numero-1])) return;
-    manejar_comandos_externos(cache_comandos[numero-1]);
+    manejar_comandos_externos(cache_comandos[numero-1], -1);
 }
 
 void guardar_ruta_favs(){
