@@ -23,7 +23,7 @@ int main(){
         if(comandos == NULL) continue;
 
         for(int i=0;comandos[i] != NULL;i++){
-            if(manejar_comandos_internos(comandos[i])) continue;   // Si se ejecuto un comando interno que no trate de ejecutar uno externo 
+            if(manejar_comandos_internos(comandos[i], i)) continue;   // Si se ejecuto un comando interno que no trate de ejecutar uno externo 
 
             manejar_comandos_externos(comandos[i], i);
         }

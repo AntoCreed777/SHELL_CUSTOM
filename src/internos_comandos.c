@@ -13,24 +13,36 @@
 
 
 //Comandos internos utilizados por la shell
-static int timer_command(char **comando) {
-    if (comando[1] == NULL)
+static int timer_command(char **comando, int num_comandos) {
+    if (comando[1] == NULL) {
         printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
+        comandos_validos[num_comandos] = false;
+    }
     
-    else if (strcmp(comando[1], "recordatorio") != 0)
+    else if (strcmp(comando[1], "recordatorio") != 0) {
         printf(ROJO "COMANDO INVALIDO" RESET_COLOR "\n");
+        comandos_validos[num_comandos] = false;
+    }
 
-    else if (comando[2] == NULL)
+    else if (comando[2] == NULL) {
         printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
+        comandos_validos[num_comandos] = false;
+    }
 
-    else if (strcmp(comando[2], "help") == 0)
+    else if (strcmp(comando[2], "help") == 0) {
         printf("set recordatorio [time] [mensaje]\n"); // Ayuda de como es la estructura del comando
+        comandos_validos[num_comandos] = true;
+    }
 
-    else if (comando[3] == NULL)
+    else if (comando[3] == NULL) {
         printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
+        comandos_validos[num_comandos] = false;
+    }
 
-    else if (atoi(comando[2]) <= 0)
+    else if (atoi(comando[2]) <= 0) {
         printf(ROJO "DEBE SER UN NUMERO MAYOR A 0 PARA INDICAR TIEMPO" RESET_COLOR "\n");
+        comandos_validos[num_comandos] = false;
+    }
 
     else {
         pid_t pid = fork();
@@ -52,6 +64,7 @@ static int timer_command(char **comando) {
         }
 
         printf(AMARILLO "Alarma configurada para dentro de %d segundos." RESET_COLOR "\n" RESET_COLOR, atoi(comando[2]));
+        comandos_validos[num_comandos] = true;
     }
 
     return 1;
@@ -187,7 +200,7 @@ static int favs_command(char **comando) {
 }
 
 // Manejar comandos internos propios de esta SHELL
-int manejar_comandos_internos(char **comando) {
+int manejar_comandos_internos(char **comando, int num_comandos) {
     if(strcmp(comando[0], "exit") == 0) {     //Si se escribe "exit" se termina ded ejecutar el programa
         raise(SIGTERM);
     }
@@ -201,7 +214,7 @@ int manejar_comandos_internos(char **comando) {
     }
 
     if(strcmp(comando[0], "set") == 0) {
-        return timer_command(comando);
+        return timer_command(comando, num_comandos);
     }
 
     if(strcmp(comando[0], "favs") == 0) {
