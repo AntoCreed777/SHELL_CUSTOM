@@ -96,21 +96,22 @@ static int favs_command(char **comando) {
 
     else if (strcmp(comando[1], "crear") == 0)
     { // Crea archivo donde se almacenan los comandos favoritos
-        if (comando[2] == NULL)
-        {
+        if (comando[2] == NULL){
             printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
             return 1;
         }
 
         FILE *file = fopen(comando[2], "w");
-        if (file == NULL) 
+        if (file == NULL) {
             printf(ROJO "Error al crear el archivo" RESET_COLOR "\n");
-        else {
-            fclose(file);
-            archivo_favs = strdup(comando[2]);
-            guardar_ruta_favs();
-            printf(AMARILLO "Archivo creado exitosamente" RESET_COLOR "\n");
+            return 1;
         }
+        
+        fclose(file);
+        archivo_favs = strdup(comando[2]);
+        guardar_ruta_favs();
+        printf(AMARILLO "Archivo creado exitosamente" RESET_COLOR "\n");
+
     }
 
     else if (strcmp(comando[1], "mostrar") == 0)

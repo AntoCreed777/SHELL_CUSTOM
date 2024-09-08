@@ -18,6 +18,7 @@ void guardar_favs(){
 
     if(cache_comandos == NULL || cache_comandos[0] == NULL){
         printf(AMARILLO "No hay comandos favoritos para guardar\n" RESET_COLOR);
+        fclose(file);
         return;
     }
 
@@ -152,6 +153,7 @@ bool cargar_favs(){
         cache_comandos[canticad_cache] = NULL;
     }
 
+    fclose(file);
     return true;
     
 }
@@ -251,14 +253,16 @@ void ejecutar_favs(int numero){
 }
 
 void guardar_ruta_favs(){
-        FILE *file = fopen(direccion_favs, "w");
-        if (file == NULL) {
-            perror(ROJO "Error al abrir el archivo de dirección de favoritos" RESET_COLOR);
-            liberar_memoria_programa();
-            exit(EXIT_FAILURE);
-        }
-        fputs(archivo_favs, file);
-        fclose(file);
+    FILE *file = fopen(direccion_favs, "w");
+    if (file == NULL) {
+        perror(ROJO "Error al abrir el archivo de dirección de favoritos" RESET_COLOR);
+        liberar_memoria_programa();
+        exit(EXIT_FAILURE);
+    }
+
+    fputs(archivo_favs, file);
+
+    fclose(file);
 }
 
 void cargar_ruta_favs(){
@@ -269,15 +273,13 @@ void cargar_ruta_favs(){
         perror(ROJO "Error al abrir el archivo de dirección de favoritos" RESET_COLOR);
         printf(AMARILLO "Se creará/usara un archivo de favoritos por defecto.\n" RESET_COLOR);
         archivo_favs = strdup("favs.csv");
+        return;
     }
-    else{
-        archivo_favs = (char*)malloc(256 * sizeof(char));  // Reserva espacio para 256 caracteres
-        if (archivo_favs == NULL) {
-            perror(ROJO "Error al asignar memoria para archivo_favs" RESET_COLOR);
-            liberar_memoria_programa();
-            exit(EXIT_FAILURE);
-        }
-        fscanf(file, "%s", archivo_favs);
-        fclose(file);
-    }
+
+    if(archivo_favs != NULL) free(archivo_favs);
+
+    
+    fscanf(file, "%s", archivo_favs);
+    fclose(file);
+
 }
