@@ -11,7 +11,7 @@ extern pid_t c_pid;
 
 
 extern char *archivo_favs;  //Archivo donde se guarda la lista de favoritos
-extern const char *direccion_favs;  //Archivo donde se guarda la direccion del archivo de favoritos
+extern char *direccion_favs;  //Archivo donde se guarda la direccion del archivo de favoritos
 
 
 

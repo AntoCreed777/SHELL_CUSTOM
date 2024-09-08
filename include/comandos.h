@@ -12,3 +12,5 @@ char ***entrada_comandos();
 void guardar_comandos_cache();
 
 void guardar_comandos_anteriores();
+
+void cargar_ruta_direccion_favs();

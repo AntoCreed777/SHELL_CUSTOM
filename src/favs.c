@@ -10,7 +10,7 @@
 #include "interfaz.h"
 
 
-void guardar_favs(){
+void guardar_favs(){    
     if (archivo_favs == NULL || access(archivo_favs, F_OK) == -1) {
         printf(AMARILLO "El archivo de favoritos no existe\n" RESET_COLOR);
         return;
@@ -275,8 +275,7 @@ void guardar_ruta_favs(){
     fclose(file);
 }
 
-void cargar_ruta_favs(){
-
+void cargar_ruta_favs() {
     FILE *file = fopen(direccion_favs, "r");
     if (file == NULL) {
         perror(ROJO "Error al abrir el archivo de dirección de favoritos" RESET_COLOR);
@@ -284,10 +283,23 @@ void cargar_ruta_favs(){
         return;
     }
 
-    if(archivo_favs != NULL) free(archivo_favs);
+    // Asignar un buffer temporal para leer el contenido
+    char buffer[BUFFER_SIZE];
 
-    
-    fscanf(file, "%s", archivo_favs);
+    if (fgets(buffer, sizeof(buffer), file) != NULL) {
+        buffer[strcspn(buffer, "\n")] = '\0';
+
+        // Liberar memoria previa y asignar nueva memoria para archivo_favs
+        if (archivo_favs != NULL) free(archivo_favs);
+
+        archivo_favs = strdup(buffer);
+        if (archivo_favs == NULL) {
+            perror("Error al asignar memoria para archivo_favs");
+            fclose(file);
+            return;
+        }
+    }
+    else printf(AMARILLO "No se encontró ninguna ruta de archivo de favoritos\n" RESET_COLOR);
+
     fclose(file);
-
 }

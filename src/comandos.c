@@ -6,6 +6,9 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <stdbool.h>
+#include <limits.h>
+#include <libgen.h>
+
 #include "comandos.h"
 #include "interfaz.h"
 #include "constantes.h"
@@ -208,4 +211,20 @@ void guardar_comandos_anteriores(){
     }
     comandos_anteriores = (char***)realloc(comandos_anteriores,sizeof(char**) * (num_comandos+1));
     comandos_anteriores[num_comandos] = NULL;
+}
+
+void cargar_ruta_direccion_favs(){
+    char ruta[PATH_MAX];        // PATH_MAX es el límite máximo para la longitud de una ruta en el sistema
+    ssize_t len = readlink("/proc/self/exe", ruta, sizeof(ruta) - 1);  // "self" representa el PID actual
+    
+    if (len != -1) {
+        ruta[len] = '\0';
+        direccion_favs = dirname(ruta);
+        strcat(direccion_favs, "/direccion_favs.txt");
+    }
+    else {
+        perror("Error al obtener la ruta del repositorio");
+        liberar_memoria_programa();
+        exit(EXIT_FAILURE);
+    }
 }

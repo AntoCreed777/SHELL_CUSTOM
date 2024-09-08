@@ -139,10 +139,33 @@ static int favs_command(char **comando) {
         }
         
         fclose(file);
-        archivo_favs = strdup(comando[2]);
+        
+        if (comando[2][0] != '/') {
+            char *ruta = getcwd(NULL, 0);
+
+            if (archivo_favs != NULL) free(archivo_favs);
+            archivo_favs = (char *)malloc(strlen(ruta) + strlen(comando[2]) + 2);
+            if (archivo_favs == NULL) {
+                perror(ROJO "Error al guardar la ruta del archivo de favoritos" RESET_COLOR);
+                return 1;
+            }
+
+            strcpy(archivo_favs, ruta);
+            strcat(archivo_favs, "/");
+            strcat(archivo_favs, comando[2]);
+            free(ruta);
+        }
+        else {
+            archivo_favs = strdup(comando[2]);
+            if (archivo_favs == NULL) {
+                perror(ROJO "Error al guardar la ruta del archivo de favoritos" RESET_COLOR);
+                return 1;
+            }
+        }
+
         guardar_ruta_favs();
         printf(AMARILLO "Archivo creado exitosamente" RESET_COLOR "\n");
-
+        return 1;
     }
 
     else if (strcmp(comando[1], "mostrar") == 0)

@@ -18,7 +18,7 @@ pid_t c_pid = -1;
 int indice_inicio_anterior_linea_comando = 0;
 
 char *archivo_favs = NULL;  //Archivo donde se guarda la lista de favoritos
-const char *direccion_favs = "direccion_favs.txt";  //Archivo donde se guarda la direccion del archivo de favoritos
+char *direccion_favs = NULL;  //Archivo donde se guarda la direccion del archivo de favoritos
 
 
 
