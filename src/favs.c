@@ -268,6 +268,7 @@ void cargar_ruta_favs(){
     if (file == NULL) {
         perror(ROJO "Error al abrir el archivo de dirección de favoritos" RESET_COLOR);
         printf(AMARILLO "Se creará/usara un archivo de favoritos por defecto.\n" RESET_COLOR);
+        archivo_favs = strdup("favs.csv");
     }
     else{
         archivo_favs = (char*)malloc(256 * sizeof(char));  // Reserva espacio para 256 caracteres

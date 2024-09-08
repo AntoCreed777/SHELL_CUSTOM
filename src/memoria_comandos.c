@@ -14,7 +14,7 @@ char ***comandos_anteriores = NULL;
 pid_t c_pid = -1;
 int indice_inicio_anterior_linea_comando = 0;
 
-char *archivo_favs = "favs.csv";  //Archivo donde se guarda la lista de favoritos
+char *archivo_favs = NULL;  //Archivo donde se guarda la lista de favoritos
 const char *direccion_favs = "direccion_favs.txt";  //Archivo donde se guarda la direccion del archivo de favoritos
 
 
@@ -51,4 +51,5 @@ void liberar_memoria_programa(){
     liberar_comandos();
     liberar_cache();
     liberar_comandos_anteriores();
+    free(archivo_favs);
 }
