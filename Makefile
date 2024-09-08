@@ -43,7 +43,7 @@ debug: $(TARGET)
 
 # Regla para investigar las fugas de memoria
 memoria: $(TARGET)
-	@valgrind --leak-check=full ./$(TARGET)
+	@valgrind --leak-check=full --track-origins=yes ./$(TARGET)
 
 # Regla para limpiar los archivos objeto y el ejecutable
 clean:
