@@ -9,10 +9,6 @@ extern char ***comandos_anteriores;
 
 char ***entrada_comandos();
 
-void liberar_comandos();
-
-void liberar_cache();
-
 void guardar_comandos_cache();
 
 void guardar_comandos_anteriores();
