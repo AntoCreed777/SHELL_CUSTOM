@@ -14,7 +14,13 @@
 
 //Comandos internos utilizados por la shell
 static int timer_command(char **comando) {
-    if (comando[1] == NULL || comando[2] == NULL)
+    if (comando[1] == NULL)
+        printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
+    
+    else if (strcmp(comando[1], "recordatorio") != 0)
+        printf(ROJO "COMANDO INVALIDO" RESET_COLOR "\n");
+
+    else if (comando[2] == NULL)
         printf(ROJO "FALTAN ARGMENTOS" RESET_COLOR "\n");
 
     else if (strcmp(comando[2], "help") == 0)
@@ -26,8 +32,7 @@ static int timer_command(char **comando) {
     else if (atoi(comando[2]) <= 0)
         printf(ROJO "DEBE SER UN NUMERO MAYOR A 0 PARA INDICAR TIEMPO" RESET_COLOR "\n");
 
-    else
-    {
+    else {
         pid_t pid = fork();
 
         if (pid == 0) { // Proceso hijo
