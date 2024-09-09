@@ -130,7 +130,7 @@ void guardar_comandos_cache(){
         int posicion_cache = num_cache + num_comandos;
 
         // Reasignar memoria para el nuevo comando
-        cache_comandos = (char***)realloc(cache_comandos,sizeof(char**) * (posicion_cache + 1));
+        cache_comandos = (char***)realloc(cache_comandos,sizeof(char**) * (posicion_cache + 2));
         if(cache_comandos == NULL){
             perror(ROJO "Error en la reasignación de memoria" RESET_COLOR);
             liberar_memoria_programa();
@@ -157,12 +157,12 @@ void guardar_comandos_cache(){
         // Terminar el array de elementos del comando con NULL
         cache_comandos[posicion_cache] = (char**)realloc(cache_comandos[posicion_cache],sizeof(char*) * (num_elementos+1));
         cache_comandos[posicion_cache][num_elementos] = NULL;
+        
+        // Terminar el array de comandos con NULL
+        cache_comandos[posicion_cache+1] = NULL;
+        
         num_comandos++;
     }
-
-    // Terminar el array de comandos anteriores con NULL
-    cache_comandos = (char***)realloc(cache_comandos,sizeof(char**) * (num_comandos + num_cache +1));
-    cache_comandos[num_comandos + num_cache] = NULL;
 }
 
 
