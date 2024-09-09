@@ -22,7 +22,7 @@
 ## Instrucciones de compilacion
 
 ### Version de compilador recomendada y sistemas testeados
-El codigo esta compilado con gcc en linux. Las distribuciones utilizadas en el testeo son Manjaro y Kali linux. 
+El codigo esta compilado con gcc en linux. Las distribuciones utilizadas en el testeo son Manjaro y Windows subsystem for linux (WSL) Ubuntu.
 
 Las version de gcc recomendada para compilar el proyecto es *gcc (GCC) 14.2.1*. 
 ### Comandos para ejecutar el código 
@@ -65,18 +65,23 @@ Este comando se encarga de gestionar los comandos favoritos. Los comandos favori
  - cargar
  - guardar
 
- #### Ejemplo 1
+#### Ejemplo 1
 
 ```favs mostrar```
 
 Esto muestra la lista de comandos favoritos.
 
- #### Ejemplo 2
- Vale recalcar que algunos comandos en esta lista requieren de argumentos.
+#### Ejemplo 2
+Vale recalcar que algunos comandos en esta lista requieren de argumentos.
 
 ```favs eliminar 2 4 3```
 
 Esto eliminar el segundo, cuarto y tercer elementos de la lista de favoritos que se ve en mostrar.
 
+#### Ejemplo 3
+Es necesario mencionar que en el comando ```ejecutar``` se modifico el funcionamiento con respecto al enunciado, en donde se invirtio el orden de los argumentos.
 
+```favs ejecutar 1```
+
+Esto ejecutara el primer elemento de la lista de favoritos
 
