@@ -31,8 +31,12 @@ void manejar_comandos_externos(char **comando, int num_comando){
             
             if (waitpid(c_pid, &status, 0) == -1) {
                 perror(ROJO "waitpid" RESET_COLOR);
+                /*
                 liberar_memoria_programa();
                 exit(EXIT_FAILURE);
+                */
+               comandos_validos[num_comando] = false;
+               return;
             }
 
             if(num_comando == -1) return;
@@ -119,8 +123,12 @@ void manejar_comandos_externos(char **comando, int num_comando){
             int status;
             if (waitpid(c_pid, &status, 0) == -1) {
                 perror(ROJO "waitpid" RESET_COLOR);
-                liberar_memoria_programa();
-                exit(EXIT_FAILURE);
+                for(int k = 0; k < num_pipe; k++) {
+                    close(pidfc[k][0]);
+                    close(pidfc[k][1]);
+                }
+                comandos_validos[num_comando] = false;
+                return;
             }
             
             if(num_comando == -1) {

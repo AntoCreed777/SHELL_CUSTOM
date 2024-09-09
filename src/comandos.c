@@ -102,8 +102,6 @@ char ***entrada_comandos(){
     return comandos;
 }
 
-
-
 void guardar_comandos_cache(){
     int num_comandos = 0, num_invalidos = 0, num_cache = 0;
 
@@ -115,7 +113,7 @@ void guardar_comandos_cache(){
     while(comandos[num_comandos + num_invalidos] != NULL) {
         bool guardado_ignorado = 
             //comandos_validos[num_comandos + num_invalidos] == false ||        // No se porque no funciona aqui pero si despues
-            is_in_cache(comandos[num_comandos + num_invalidos], cache_comandos) ||
+            is_in_cache(comandos[num_comandos + num_invalidos]) ||
             strcmp(comandos[num_comandos + num_invalidos][0],"!!") == 0 ||
             strcmp(comandos[num_comandos + num_invalidos][0],"favs") == 0;
 

@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "utils.h"
+#include "memoria_comandos.h"
 
 bool is_empty_linea(char* linea){
     if (linea == NULL) return true;
@@ -24,24 +25,17 @@ char *eliminar_tabs(char *linea){
     return linea;
 }
 
-bool is_in_cache(char** comandos, char*** cache_comand){
-    if (cache_comand == NULL)
-        return false;
-    int i = 0;
-    while(cache_comand[i]){
-        int j = 0;
-        while (cache_comand[i][j] && comandos[j]){
+bool is_in_cache(char** comandos){
+    if (cache_comandos == NULL || cache_comandos[0] == NULL) return false;
 
-            if (strcmp(cache_comand[i][j], comandos[j]) != 0)
+    for(int num_comando = 0; cache_comandos[num_comando] != NULL; num_comando++){   // Comandos en cache
+        for(int num_elemento = 0; cache_comandos[num_comando][num_elemento] != NULL; num_elemento++){   // Elementos del Comando
+            if(comandos[num_elemento] == NULL) return false;    // Si el comando no tiene la misma cantidad de elementos
+            if(strcmp(cache_comandos[num_comando][num_elemento],comandos[num_elemento]) != 0)   // Si los elementos no son iguales
                 break;
-
-            j++;
-            
+            if(cache_comandos[num_comando][num_elemento+1   ] == NULL && comandos[num_elemento+1] == NULL) // Si llegamos al final de ambos comandos
+                return true;
         }
-        if (cache_comand[i][j] == NULL && comandos[j] == NULL){
-            return true;
-        }
-        i++;
     }
     return false;
 }

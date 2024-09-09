@@ -274,6 +274,7 @@ void guardar_ruta_favs(){
 
     fclose(file);
 }
+
 void cargar_ruta_favs() {
     // Verificar que direccion_favs esté inicializado
     if (direccion_favs == NULL) {
