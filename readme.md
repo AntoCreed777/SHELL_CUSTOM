@@ -2,9 +2,9 @@
 
 # Proyecto shell custom
 ## Integrantes del grupo
-- [Carlos Tomás Álvarez Norambuena](https://github.com/Karantooo)  (*2022433621*)
-- [Antonio  Jesus Benavides Puentes](https://github.com/AntoCreed777) (*2023455954*)
-- [Javier Alejandro Campos Contreras](https://github.com/huebitoo) (*2023432857*)
+- [Carlos Tomás Álvarez Norambuena](https://github.com/Karantooo)  **(2022433621)**
+- [Antonio  Jesus Benavides Puentes](https://github.com/AntoCreed777) **(2023455954)**
+- [Javier Alejandro Campos Contreras](https://github.com/huebitoo) **(2023432857)**
 
 ## Tecnologias utilizadas en el proyecto
 <p align="center">
@@ -56,14 +56,26 @@ Esto creara un recordatorio en 10 segundos con el mensaje hola mundo.
 Este comando se encarga de gestionar los comandos favoritos. Los comandos favoritos se añaden a la lista automaticamente cuando se ejecutan por primera vez en la terminal. Las diferentes opciones de este comando son:
 
  - help 
- - crear  ruta/ejemplo.csv
+ - crear ruta/ejemplo.csv
  - mostrar
- - eliminar num1, num2,...
+ - eliminar num1, num2
  - buscar cmd
  - borrar
  - ejecutar num
  - cargar
  - guardar
+
+ ### CAMBIOS E INTERPRETACIONES HECHAS EN NUESTRO PROYECTO
+ <span style="color: red;">Dentro del enunciado se tuvieron que hacer interpretaciones y algunos cambios menores. A continuación se detallan los mismos:</span>
+
+ - En el enunciado aparace que la estructura del comando ejecutar era ```favs num ejecutar```. Nosotros lo dejamos como ```favs ejecutar num``` ya que consideramos que era más coherente con el comando eliminar. 
+
+ - En el comando cargar se podia interpretar de distintas maneras. Nosotros lo interpretamos como que cargar no sobrescribe lo que hay en RAM sino que concatena el contenido del archivo a lo que ya esta presente en RAM. Los elementos que ya estan cargados en memoria no se terminan repitiendo.
+
+ - En el enunciado aparecia ```favs eliminar num1, num2```. Nosotros lo interpretamos como que se podia tomar una cantidad no determinada de comandos y que eliminábamos los comandos con esos numeros. Otra interpretacion con la que nos debatimos era que num1 y num2 fuera un limite superior e inferior pero nos decantamos por la primera. 
+
+- En el enunciado se dice "*Los comandos favoritos deben almacenarse en
+alguna estructura de datos que contenga los comandos en memoria cuando la shell esté activa y en un archivo cuando la shell se cierra...*". En favs guardar consideramos que lo más lógico es que fuese la escritura en disco. Asi los unicos comandos que escriben en disco son guardar, cargar y crear, el resto se guardan en la lista que tenemos en RAM.
 
 #### Ejemplo 1
 
